@@ -6,7 +6,7 @@
 #include <WiFi.h>
 #include <ESP_Mail_Client.h>
 #include "watering.h" // set sensores
-
+#include "pass.h"
 //#include "log.h"      // sets the logging files, needs to be set after the waterings, as it uses some of the watering data
 //#include "mail_me.h"
 
@@ -18,13 +18,9 @@
 #define WATER_HOUR 11
 #define WATER_MINUTES 45
 #define WATER_DURATION_S 5
-#define  SMTP_PORT 465
-
+#define SMTP_PORT 465
 #define SMTP_HOST  "smtp.gmail.com"
-///* The sign in credentials */
-#define AUTHOR_EMAIL  "marcogranadaesp@gmail.com"
-#define AUTHOR_PASSWORD  "uyudiggeebkeraud"
-#define RECIPIENT_EMAIL  "marcogranada@gmail.com"
+
 
 /* The SMTP Session object used for Email sending */
 class MyLog {
@@ -63,8 +59,7 @@ void google_graph(WiFiClient client);
  * * WIFI Set up
 */
 
-const char* ssid = "VM7265119";         //"REPLACE_WITH_YOUR_SSID";
-const char* password = "yqwvnmJZp5rr";  //"REPLACE_WITH_YOUR_PASSWORD";
+
 
 WateringSystem WS;
 MyLog Logger;
@@ -100,8 +95,8 @@ void setup() {
 
   // Connect to Wi-Fi network with SSID and password
   Serial.print("Connecting to ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
+  Serial.println(WIFI_SSID );
+  WiFi.begin(WIFI_SSID , WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(100);
     Serial.print(".");

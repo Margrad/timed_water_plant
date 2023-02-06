@@ -2,7 +2,7 @@
 #define WATERING_H
 #include "arduino.h"
 
-#define SENSORS_NUM 8
+#define SENSORS_NUM 4
 #define PUMPS_NUM 5
 
 
@@ -24,7 +24,8 @@ class WateringSystem {
     struct _pump pump[PUMPS_NUM];
     bool is_watering = false;
 
-    int sensorPin[SENSORS_NUM] = {33, 32, 35, 34, 25, 26,27, 13};
+    int sensorPin[SENSORS_NUM] = { 33, 32, 35, 34};
+    
     int pumpPin[PUMPS_NUM] = {15, 5, 19, 21, 22};
     // auciliar watering functions
 
