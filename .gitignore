@@ -1,0 +1,7 @@
+#ignore accounts/passwords
+pass.*
+
+#ignore generated files
+*.svd
+debug*
+
