@@ -4,12 +4,18 @@
 */
 
 #include <WiFi.h>
-//#include <ESP_Mail_Client.h>
 #include "watering.h" // set sensores
 #include "pass.h"
 #include "log.h"      // sets the logging files, needs to be set after the waterings, as it uses some of the watering data
 
+/* The sign in credentials present in pass.h
+#define AUTHOR_EMAIL "email_esp_uses@to_send.emails"
+#define AUTHOR_PASSWORD  "Password used for the esp32 email"
+#define RECIPIENT_EMAIL  "email_you_send@emails.to"
+#define WIFI_SSID  "REPLACE_WITH_YOUR_SSID"
+#define WIFI_PASSWORD "REPLACE_WITH_YOUR_PASSWORD";
 
+*/
 /* ***********************************************
  * *Set up Email
 */
