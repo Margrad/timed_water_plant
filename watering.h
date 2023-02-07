@@ -34,7 +34,6 @@ class WateringSystem {
     bool set_automatic_watering_on();
     bool set_automatic_watering_off();
 
-
     void water_plant(int pumpIndex);
 
     void update_sensores();
