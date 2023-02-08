@@ -4,8 +4,8 @@
 */
 
 #include <WiFi.h>
-#include "watering.h" // set sensores
-#include "pass.h"
+#include "watering.h" // set sensores and pumps
+#include "pass.h"     // where the passwords are
 #include "log.h"      // sets the logging files, needs to be set after the waterings, as it uses some of the watering data
 
 /* The sign in credentials present in pass.h
@@ -14,52 +14,42 @@
 #define RECIPIENT_EMAIL  "email_you_send@emails.to"
 #define WIFI_SSID  "REPLACE_WITH_YOUR_SSID"
 #define WIFI_PASSWORD "REPLACE_WITH_YOUR_PASSWORD";
+*/
 
-*/
-/* ***********************************************
- * *Set up Email
-*/
+
+// Define the time between data logging in minutes
 #define LOG_INTERVAL_MINS 10
-#define WATER_HOUR 11
-#define WATER_MINUTES 45
-#define WATER_DURATION_S 5
 
 
-
-/* The SMTP Session object used for Email sending */
-
-/* Callback function to get the Email sending status */
-
-
-void webserver(void * pvParameters);
+void webserver();
 void google_graph(WiFiClient client);
 
 /* ***********************************************
- * * WIFI Set up
+ * * WIFI server Set up
 */
-
-
-
-WateringSystem WS;
-MyLog Logger;
+// Set web server port number to 7531 (easier to use a different port from 80 for port forwarding)
 WiFiServer server(7531);
-
-
-// Set web server port number to 80 (http)
 String header;           // Variable to store the HTTP request
 unsigned long currentTime = millis();
 unsigned long previousTime = 0;
 const long timeoutTime = 2000; // 2s
 
 
-/* ***********************************************
- * *  SET-UP Watering system
-*/
+/*******************************************************
+ * Setting both classes created for this project
+ */
+WateringSystem WS;
+MyLog Logger;
+
+
 
 // Time variables
 struct tm timeinfo;
 bool Flag_log = true;
-int cur_year, cur_month, cur_day, cur_hour, cur_min, cur_s;
+
+// time when the Logger will be called to log sensors data
+int log_hour, log_min;
+
 char date_buffer[30];
 
 // the setup function runs once when you press reset or power the board
@@ -67,34 +57,32 @@ void setup() {
   Serial.begin(115200);
   analogReadResolution(12);
 
+  // Initialize the Watering system
   WS.init_watering();
-
-
-  delay(1);
 
   // Connect to Wi-Fi network with SSID and password
   Serial.print("Connecting to ");
   Serial.println(WIFI_SSID );
   WiFi.begin(WIFI_SSID , WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
-    delay(100);
+    delay(200);
     Serial.print(".");
   }
   Serial.println("!");
-  WiFi.enableIpV6();
-  Serial.println("Getting IPv6");
-  delay(2000);
+//  WiFi.enableIpV6();
+//  Serial.println("Getting IPv6");
+//  delay(2000);
   // Print local IP address and start web server
   Serial.println("WiFi connected.");
   Serial.println("IPv4 address:");
   Serial.println(WiFi.localIP());
-  Serial.println("IPv6 address:");
-  Serial.println(WiFi.localIPv6());
-  Serial.print("AP IPv6: ");
-  Serial.println(WiFi.softAPIPv6());
+//  Serial.println("IPv6 address:");
+//  Serial.println(WiFi.localIPv6());
+//  Serial.print("AP IPv6: ");
+//  Serial.println(WiFi.softAPIPv6());
   server.begin();
 
-  //Get real time
+  //Get current time information
   Serial.println("Getting current time:");
   configTime(0, 3600, "time.google.com");
 
@@ -103,67 +91,64 @@ void setup() {
     Serial.println("Could not obtain time info");
     configTime(0, 3600, "time.google.com");
   }
-  cur_year = timeinfo.tm_year;
-  cur_month = timeinfo.tm_mon;
-  
-  if (timeinfo.tm_hour >= WATER_HOUR && timeinfo.tm_min > WATER_MINUTES )
-    cur_day = timeinfo.tm_mday + 1;
-  else
-      cur_day = timeinfo.tm_mday;
-      
-  cur_hour = timeinfo.tm_hour;
-  cur_min = timeinfo.tm_min + LOG_INTERVAL_MINS;
-  if (cur_min >= 60 ) {
-    cur_min -= 60;
-    cur_hour++;
-  }
-  if (cur_hour > 23 ) cur_hour = 0;
-  cur_s = timeinfo.tm_sec;
 
+  // Display current time
   strftime(date_buffer, sizeof(date_buffer), "%Y/%m/%d %H:%M:%S", &timeinfo);
   Serial.println(date_buffer);
   WS.update_sensores();
+
+  // Log starting data
   Logger.save_to_log(timeinfo, WS.sensor);
+
+  // Set the next time to log the sensors data
+  log_hour = timeinfo.tm_hour;
+  log_min = timeinfo.tm_min + LOG_INTERVAL_MINS;
+  if (log_min >= 60 ) {
+    log_min -= 60;
+    log_hour++;
+  }
+  if (log_hour > 23 ) log_hour = 0;
 }
 
 
 
 void loop() {
 
-  webserver(NULL);
+  webserver();
+  
   getLocalTime(&timeinfo);
 
   WS.TimeChecker(&timeinfo);
 
     // Log stuff
-    if (timeinfo.tm_min == cur_min && timeinfo.tm_hour == cur_hour)
+    if (timeinfo.tm_min == log_min && timeinfo.tm_hour == log_hour)
     {
       strftime(date_buffer, sizeof(date_buffer), "%Y%m%d%H%M%S", &timeinfo);
       Serial.println(date_buffer);
       /// Update next time to log
       WS.update_sensores();
-      cur_hour = timeinfo.tm_hour;
-      cur_min = timeinfo.tm_min + LOG_INTERVAL_MINS;
-      if (cur_min >= 60 ) {
-        cur_min -= 60;
-        cur_hour++;
+      log_hour = timeinfo.tm_hour;
+      log_min = timeinfo.tm_min + LOG_INTERVAL_MINS;
+      if (log_min >= 60 ) {
+        log_min -= 60;
+        log_hour++;
       }
-      if (cur_hour >= 23 ) cur_hour = 0;
+      if (log_hour >= 23 ) log_hour = 0;
       //
       Logger.save_to_log(timeinfo, WS.sensor);
-      cur_hour = timeinfo.tm_hour;
-      cur_min = timeinfo.tm_min + LOG_INTERVAL_MINS;
-      if (cur_min >= 60 ) {
-        cur_min -= 60;
-        cur_hour++;
+      log_hour = timeinfo.tm_hour;
+      log_min = timeinfo.tm_min + LOG_INTERVAL_MINS;
+      if (log_min >= 60 ) {
+        log_min -= 60;
+        log_hour++;
       }
-      if (cur_hour > 23 ) cur_hour = 0;
+      if (log_hour > 23 ) log_hour = 0;
     }
 
 }
 
 
-void webserver( void * pvParameters) {
+void webserver() {
   //char num_buffer[17];
   WiFiClient client = server.available();   // Listen for incoming clients
 
