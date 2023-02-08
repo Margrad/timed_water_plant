@@ -131,45 +131,10 @@ void setup() {
 void loop() {
 
   webserver(NULL);
-
-
   getLocalTime(&timeinfo);
-  // check for auto watering time
-  if (timeinfo.tm_mon > cur_month)
-  {
-    cur_month++;
-    cur_day = 1;
-  }
 
-  if (WS.is_watering  == false)
-  {
-    if (timeinfo.tm_hour == WATER_HOUR && timeinfo.tm_min == WATER_MINUTES)
-    {
-      if (timeinfo.tm_mday == cur_day)
-      {
-        for (int i = 0; i < PUMPS_NUM; i++)
-        {
-          WS.pump[i].State = 1;
-          WS.water_plant(i);
-        }
-        WS.is_watering  = true;
-      }
-    }
-  }
+  WS.TimeChecker(&timeinfo);
 
-  if (WS.is_watering == true)
-  {
-    if (timeinfo.tm_sec >= WATER_DURATION_S)
-    {
-      for (int i = 0; i < PUMPS_NUM; i++)
-      {
-        WS.pump[i].State = 0;
-        WS.water_plant(i);
-      }
-      WS.is_watering  = false;
-      cur_day++;
-    }
-  }
     // Log stuff
     if (timeinfo.tm_min == cur_min && timeinfo.tm_hour == cur_hour)
     {
