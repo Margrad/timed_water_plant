@@ -14,11 +14,12 @@ void WateringSystem::init_watering() {
     pinMode(pump[i].Pin, OUTPUT);
     digitalWrite(pump[i].Pin, HIGH);
     pump[i].s_hour = 10;
-    pump[i].s_min = 15;
+    pump[i].s_min = 45;
     pump[i].s_sec = 0;
     pump[i].e_hour = 10;
-    pump[i].e_min = 15;
-    pump[i].e_sec = 15;
+    pump[i].e_min = 45;
+    pump[i].e_sec = 10;
+    pump[i].automatic_mode = true;
   }
 }
 
@@ -48,18 +49,21 @@ void WateringSystem::TimeChecker(struct tm *timeinfo)
         // Check it is time to turn the pump on, but not to late to keep it of
         if ((timeinfo->tm_hour >= pump[i].s_hour) && (timeinfo->tm_hour <= pump[i].e_hour) &&         //check hours
             (timeinfo->tm_min >= pump[i].s_min) && (timeinfo->tm_min <= pump[i].e_min) &&
-            ( timeinfo->tm_sec <= pump[i].s_sec) &&   (timeinfo->tm_sec <= pump[i].s_sec)) {
+            ( timeinfo->tm_sec >= pump[i].s_sec) &&   (timeinfo->tm_sec <= pump[i].e_sec)) {
           pump[i].State = true;
           water_plant(i);
+          Serial.print("Pump "); Serial.print(i); Serial.println(": ON");
         }
       }
-    }
+    
     else // The pum is on, need to check if it's time to turn it off
     {
-      if((timeinfo->tm_hour >= pump[i].e_hour) &&  (timeinfo->tm_min >= pump[i].e_min) &&  (timeinfo->tm_sec >= pump[i].s_sec)){
+      if((timeinfo->tm_hour >= pump[i].e_hour) &&  (timeinfo->tm_min >= pump[i].e_min) &&  (timeinfo->tm_sec >= pump[i].e_sec)){
           pump[i].State = false;
-          water_plant(i);        
+          water_plant(i);
+          Serial.print("Pump "); Serial.print(i); Serial.println(": OFF");        
       }
     }
+  }
   }
 }
