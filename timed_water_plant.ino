@@ -9,11 +9,11 @@
 #include "log.h"      // sets the logging files, needs to be set after the waterings, as it uses some of the watering data
 
 /* The sign in credentials present in pass.h
-#define AUTHOR_EMAIL "email_esp_uses@to_send.emails"
-#define AUTHOR_PASSWORD  "Password used for the esp32 email"
-#define RECIPIENT_EMAIL  "email_you_send@emails.to"
-#define WIFI_SSID  "REPLACE_WITH_YOUR_SSID"
-#define WIFI_PASSWORD "REPLACE_WITH_YOUR_PASSWORD";
+  #define AUTHOR_EMAIL "email_esp_uses@to_send.emails"
+  #define AUTHOR_PASSWORD  "Password used for the esp32 email"
+  #define RECIPIENT_EMAIL  "email_you_send@emails.to"
+  #define WIFI_SSID  "REPLACE_WITH_YOUR_SSID"
+  #define WIFI_PASSWORD "REPLACE_WITH_YOUR_PASSWORD";
 */
 
 
@@ -36,8 +36,8 @@ const long timeoutTime = 2000; // 2s
 
 
 /*******************************************************
- * Setting both classes created for this project
- */
+   Setting both classes created for this project
+*/
 WateringSystem WS;
 MyLog Logger;
 
@@ -69,17 +69,17 @@ void setup() {
     Serial.print(".");
   }
   Serial.println("!");
-//  WiFi.enableIpV6();
-//  Serial.println("Getting IPv6");
-//  delay(2000);
+  //  WiFi.enableIpV6();
+  //  Serial.println("Getting IPv6");
+  //  delay(2000);
   // Print local IP address and start web server
   Serial.println("WiFi connected.");
   Serial.println("IPv4 address:");
   Serial.println(WiFi.localIP());
-//  Serial.println("IPv6 address:");
-//  Serial.println(WiFi.localIPv6());
-//  Serial.print("AP IPv6: ");
-//  Serial.println(WiFi.softAPIPv6());
+  //  Serial.println("IPv6 address:");
+  //  Serial.println(WiFi.localIPv6());
+  //  Serial.print("AP IPv6: ");
+  //  Serial.println(WiFi.softAPIPv6());
   server.begin();
 
   //Get current time information
@@ -115,35 +115,35 @@ void setup() {
 void loop() {
 
   webserver();
-  
+
   getLocalTime(&timeinfo);
 
   WS.TimeChecker(&timeinfo);
 
-    // Log stuff
-    if (timeinfo.tm_min == log_min && timeinfo.tm_hour == log_hour)
-    {
-      strftime(date_buffer, sizeof(date_buffer), "%Y%m%d%H%M%S", &timeinfo);
-      Serial.println(date_buffer);
-      /// Update next time to log
-      WS.update_sensores();
-      log_hour = timeinfo.tm_hour;
-      log_min = timeinfo.tm_min + LOG_INTERVAL_MINS;
-      if (log_min >= 60 ) {
-        log_min -= 60;
-        log_hour++;
-      }
-      if (log_hour >= 23 ) log_hour = 0;
-      //
-      Logger.save_to_log(timeinfo, WS.sensor);
-      log_hour = timeinfo.tm_hour;
-      log_min = timeinfo.tm_min + LOG_INTERVAL_MINS;
-      if (log_min >= 60 ) {
-        log_min -= 60;
-        log_hour++;
-      }
-      if (log_hour > 23 ) log_hour = 0;
+  // Log stuff
+  if (timeinfo.tm_min == log_min && timeinfo.tm_hour == log_hour)
+  {
+    strftime(date_buffer, sizeof(date_buffer), "%Y%m%d%H%M%S", &timeinfo);
+    Serial.println(date_buffer);
+    /// Update next time to log
+    WS.update_sensores();
+    log_hour = timeinfo.tm_hour;
+    log_min = timeinfo.tm_min + LOG_INTERVAL_MINS;
+    if (log_min >= 60 ) {
+      log_min -= 60;
+      log_hour++;
     }
+    if (log_hour >= 23 ) log_hour = 0;
+    //
+    Logger.save_to_log(timeinfo, WS.sensor);
+    log_hour = timeinfo.tm_hour;
+    log_min = timeinfo.tm_min + LOG_INTERVAL_MINS;
+    if (log_min >= 60 ) {
+      log_min -= 60;
+      log_hour++;
+    }
+    if (log_hour > 23 ) log_hour = 0;
+  }
 
 }
 
@@ -267,51 +267,44 @@ void webserver() {
             client.println("<body><h1>Watering the plants</h1>");
             // Display current Pump state, and ON/OFF buttons
             // If the Pump is off, it displays the ON button
-            if (WS.pump[0].State ) {
-              client.print("<p>Pump 1 - State ON ");
+
+            //
+            client.print("<form action=\"/\" method=\"post\">");
+            client.print("<label for=\"fname\">First name:</label>");
+            client.print("<input type=\"text\" id=\"fname\" name=\"fname\"><br><br>");
+            client.print("<label for=\"lname\">Last name:</label>");
+            client.print("<input type=\"text\" id=\"lname\" name=\"lname\"><br><br>");
+            client.print("<input type=\"submit\" value=\"Submit\">");
+            client.print("</form>");
+
+
+            for (int pump = 0; pump < PUMPS_NUM; pump++)
+            {
+              client.print("<p>Pump ");
+              client.print(pump + 1);
+              client.print(" - State ");
+              if (WS.pump[pump].State ) {
+                client.print("ON");
+              } else {
+                client.print("OFF");
+              }
               client.println("</p>");
-              client.println("<p><a href=\"/P1/off\"><button class=\"button\">OFF</button></a></p>");
-            } else {
-              client.print("<p>Pump 1 - State OFF ");
-              client.println("</p>");
-              client.println("<p><a href=\"/P1/on\"><button class=\"button button2\">ON</button></a></p>");
+              client.print("<p><a href = \"/P");
+              client.print(pump+1);
+              if (WS.pump[pump].State ) {
+                client.print("/off");
+              } else {
+                client.print("/on");
+              }
+              client.print("\"><button class=\"button");
+              if (WS.pump[pump].State ) {
+                client.print("\">OFF");
+              } else {
+                client.print(" button2\">ON");
+              }
+              client.println("</button></a></p>");
             }
-            if (WS.pump[1].State ) {
-              client.print("<p>Pump 2 - State ON ");
-              client.println("</p>");
-              client.println("<p><a href=\"/P2/off\"><button class=\"button\">OFF</button></a></p>");
-            } else {
-              client.print("<p>Pump 2 - State OFF ");
-              client.println("</p>");
-              client.println("<p><a href=\"/P2/on\"><button class=\"button button2\">ON</button></a></p>");
-            }
-            if (WS.pump[2].State ) {
-              client.print("<p>Pump 3 - State ON ");
-              client.println("</p>");
-              client.println("<p><a href=\"/P3/off\"><button class=\"button\">OFF</button></a></p>");
-            } else {
-              client.print("<p>Pump 3 - State OFF ");
-              client.println("</p>");
-              client.println("<p><a href=\"/P3/on\"><button class=\"button button2\">ON</button></a></p>");
-            }
-            if (WS.pump[3].State ) {
-              client.print("<p>Pump 4 - State ON ");
-              client.println("</p>");
-              client.println("<p><a href=\"/P4/off\"><button class=\"button\">OFF</button></a></p>");
-            } else {
-              client.print("<p>Pump 4 - State OFF ");
-              client.println("</p>");
-              client.println("<p><a href=\"/P4/on\"><button class=\"button button2\">ON</button></a></p>");
-            }
-            if (WS.pump[4].State ) {
-              client.print("<p>Pump 5 - State ON ");
-              client.println("</p>");
-              client.println("<p><a href=\"/P5/off\"><button class=\"button\">OFF</button></a></p>");
-            } else {
-              client.print("<p>Pump 5 - State OFF ");
-              client.println("</p>");
-              client.println("<p><a href=\"/P5/on\"><button class=\"button button2\">ON</button></a></p>");
-            }
+
             client.println("<h1>Set all Pumps</h1>");
             client.println("<p><a href=\"/ALL/off\"><button class=\"button button2\">Set all OFF</button></a></p>");
             client.println("<p><a href=\"/ALL/on\"><button class=\"button button2\"> Set all ON</button></a></p>");

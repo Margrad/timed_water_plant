@@ -13,11 +13,11 @@ void WateringSystem::init_watering() {
     pump[i].State = false;
     pinMode(pump[i].Pin, OUTPUT);
     digitalWrite(pump[i].Pin, HIGH);
-    pump[i].s_hour = 9;
-    pump[i].s_min = 30;
+    pump[i].s_hour = 10;
+    pump[i].s_min = 40;
     pump[i].s_sec = 0;
-    pump[i].e_hour = 9;
-    pump[i].e_min = 30;
+    pump[i].e_hour = 10;
+    pump[i].e_min = 40;
     pump[i].e_sec = 2;
     pump[i].automatic_mode = true;
   }
@@ -25,11 +25,11 @@ void WateringSystem::init_watering() {
     pump[3].State = false;
     pinMode(pump[3].Pin, OUTPUT);
     digitalWrite(pump[3].Pin, HIGH);
-    pump[3].s_hour = 9;
-    pump[3].s_min = 30;
+    pump[3].s_hour = 10;
+    pump[3].s_min = 40;
     pump[3].s_sec = 0;
-    pump[3].e_hour = 9;
-    pump[3].e_min = 30;
+    pump[3].e_hour = 10;
+    pump[3].e_min = 40;
     pump[3].e_sec = 10;
     pump[3].automatic_mode = true;
 }
@@ -45,7 +45,10 @@ void WateringSystem::water_plant(int pumpIndex) {
 void WateringSystem::update_sensores()
 {
   for (int i = 0; i < SENSORS_NUM; i++) {
-    sensor[i].Value = analogRead(sensor[i].Pin);
+    sensor[i].Value = 0;
+    for (int j =0; j<2; j++)
+      sensor[i].Value += analogRead(sensor[i].Pin);
+  sensor[i].Value /= 2;
   }
 }
 
