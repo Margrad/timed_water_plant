@@ -277,7 +277,9 @@ void webserver() {
             client.print("<input type=\"submit\" value=\"Submit\">");
             client.print("</form>");
 
-
+            /*
+             * Print Pump config
+             */
             for (int pump = 0; pump < PUMPS_NUM; pump++)
             {
               client.print("<p>Pump ");

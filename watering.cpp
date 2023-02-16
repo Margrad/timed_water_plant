@@ -63,7 +63,7 @@ void WateringSystem::TimeChecker(struct tm *timeinfo)
         // Check it is time to turn the pump on, but not to late to keep it of
         if ((timeinfo->tm_hour >= pump[i].s_hour) && (timeinfo->tm_hour <= pump[i].e_hour) &&         //check hours
             (timeinfo->tm_min >= pump[i].s_min) && (timeinfo->tm_min <= pump[i].e_min) &&
-            ( timeinfo->tm_sec >= pump[i].s_sec) &&   (timeinfo->tm_sec <= pump[i].e_sec)) {
+            ( timeinfo->tm_sec >= pump[i].s_sec) &&   (timeinfo->tm_sec < pump[i].e_sec)) {
           pump[i].State = true;
           water_plant(i);
           Serial.print("Pump "); Serial.print(i); Serial.println(": ON");

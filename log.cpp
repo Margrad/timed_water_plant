@@ -152,9 +152,9 @@ void MyLog::save_to_log(struct tm tempo, struct _sensor *sensores) {
       }
       LOG += "]";
       if (t < LOG_SIZE - 1) {
-        LOG += ",";
+        LOG += ",\n";
       }
-      LOG += "\n";
+      // LOG += "";
     }
     LOG += "]";
 
