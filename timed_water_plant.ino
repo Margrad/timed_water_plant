@@ -23,7 +23,7 @@
 
 void webserver();
 void google_graph(WiFiClient client);
-
+void displaytime(WiFiClient client, int time);
 /* ***********************************************
  * * WIFI server Set up
 */
@@ -260,7 +260,7 @@ void webserver() {
             client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
             client.println(".button { background-color: #4CAF50; border: none; color: white; padding: 16px 40px;");
             client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
-            client.println(".button2 {background-color: #555555;}</style>");
+            client.println(".button2 {background-color: #555555;}.division {display: inline-block;padding: 0rem 1rem;}</style>");
             if (button_pressed)
               client.println("<meta http-equiv=\"Refresh\" content=\"0; URL='http://192.168.0.55:7531'\" /></head>");
             // Web Page Heading
@@ -268,20 +268,13 @@ void webserver() {
             // Display current Pump state, and ON/OFF buttons
             // If the Pump is off, it displays the ON button
 
-            //
-            client.print("<form action=\"/\" method=\"post\">");
-            client.print("<label for=\"fname\">First name:</label>");
-            client.print("<input type=\"text\" id=\"fname\" name=\"fname\"><br><br>");
-            client.print("<label for=\"lname\">Last name:</label>");
-            client.print("<input type=\"text\" id=\"lname\" name=\"lname\"><br><br>");
-            client.print("<input type=\"submit\" value=\"Submit\">");
-            client.print("</form>");
 
             /*
-             * Print Pump config
-             */
+               Print Pump config
+            */
             for (int pump = 0; pump < PUMPS_NUM; pump++)
             {
+              client.print("<p><div  class='division'>"); // Div with button
               client.print("<p>Pump ");
               client.print(pump + 1);
               client.print(" - State ");
@@ -292,7 +285,7 @@ void webserver() {
               }
               client.println("</p>");
               client.print("<p><a href = \"/P");
-              client.print(pump+1);
+              client.print(pump + 1);
               if (WS.pump[pump].State ) {
                 client.print("/off");
               } else {
@@ -305,6 +298,23 @@ void webserver() {
                 client.print(" button2\">ON");
               }
               client.println("</button></a></p>");
+              client.println("</div>");  // End of button
+
+              client.println("<div  class='division'>"); // Div with form
+              client.println("<form  method=\"GET\">");
+              client.println("<label for=\"start-time\">");
+              client.println("Choose watering starting time:</label>");
+              client.print("<input id=\"start-time\" type=\"time\" value=\"");
+              displaytime(client,WS.pump[pump].s_hour);client.print(":");displaytime(client,WS.pump[pump].s_min);client.print(":");displaytime(client,WS.pump[pump].s_sec);client.print("\" ");
+              client.println("name=\"start-time\" step=\"1\"/><div>");
+              client.println("<label for=\"stop-time\">");
+              client.println("Choose watering stop time:</label>");
+              client.print("<input id=\"stop-time\"type=\"time\" value=\"");
+              displaytime(client,WS.pump[pump].e_hour);client.print(":");displaytime(client,WS.pump[pump].e_min);client.print(":");displaytime(client,WS.pump[pump].e_sec);client.print("\" ");
+              client.println("name=\"stop-time\" step=\"1\"/>");
+              client.println("<div><input type=\"submit\" value=\"Submit times\" /></div>");
+              client.println("</div></div></form></div></p>");  // End of formn
+
             }
 
             client.println("<h1>Set all Pumps</h1>");
@@ -432,3 +442,10 @@ void google_graph(WiFiClient client) {
   client.println("chart.draw(data, options);}");
   client.println("</script>");
 }
+
+void displaytime(WiFiClient client, int time){
+  if (time <10){
+    client.print("0");
+    }
+  client.print(time);
+  }
