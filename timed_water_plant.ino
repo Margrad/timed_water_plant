@@ -278,40 +278,37 @@ void webserver() {
               client.print("<p>Pump ");
               client.print(pump + 1);
               client.print(" - State ");
-              if (WS.pump[pump].State ) {
-                client.print("ON");
-              } else {
-                client.print("OFF");
-              }
+              (WS.pump[pump].State ) ? client.print("ON") : client.print("OFF");
               client.println("</p>");
               client.print("<p><a href = \"/P");
               client.print(pump + 1);
-              if (WS.pump[pump].State ) {
-                client.print("/off");
-              } else {
-                client.print("/on");
-              }
+             (WS.pump[pump].State ) ? client.print("/off") : client.print("/on");
+//                client.print("/off");
+//              } else {
+//                client.print("/on");
+//              }
               client.print("\"><button class=\"button");
-              if (WS.pump[pump].State ) {
-                client.print("\">OFF");
-              } else {
-                client.print(" button2\">ON");
-              }
+              (WS.pump[pump].State ) ? client.print("\">OFF") : client.print(" button2\">ON");
+//              if (WS.pump[pump].State ) {
+//                client.print("\">OFF");
+//              } else {
+//                client.print(" button2\">ON");
+//              }
               client.println("</button></a></p>");
               client.println("</div>");  // End of button
 
               client.println("<div  class='division'>"); // Div with form
               client.println("<form  method=\"GET\">");
               client.println("<label for=\"start-time\">");
-              client.println("Choose watering starting time:</label>");
-              client.print("<input id=\"start-time\" type=\"time\" value=\"");
+              client.println("Watering Start:</label>");
+              client.print("<input id=\"st");client.print(pump);client.print("\" type=\"time\" value=\"");
               displaytime(client,WS.pump[pump].s_hour);client.print(":");displaytime(client,WS.pump[pump].s_min);client.print(":");displaytime(client,WS.pump[pump].s_sec);client.print("\" ");
-              client.println("name=\"start-time\" step=\"1\"/><div>");
+              client.print("name=\"st");client.print(pump);client.println("\" step=\"1\"/>");
               client.println("<label for=\"stop-time\">");
-              client.println("Choose watering stop time:</label>");
-              client.print("<input id=\"stop-time\"type=\"time\" value=\"");
+              client.println("Watering end:</label>");
+              client.print("<input id=\"et");client.print(pump);client.print("\" type=\"time\" value=\"");
               displaytime(client,WS.pump[pump].e_hour);client.print(":");displaytime(client,WS.pump[pump].e_min);client.print(":");displaytime(client,WS.pump[pump].e_sec);client.print("\" ");
-              client.println("name=\"stop-time\" step=\"1\"/>");
+              client.print("name=\"et");client.print(pump);client.println("\" step=\"1\"/>");
               client.println("<div><input type=\"submit\" value=\"Submit times\" /></div>");
               client.println("</div></div></form></div></p>");  // End of formn
 
