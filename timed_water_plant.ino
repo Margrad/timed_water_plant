@@ -299,18 +299,18 @@ void webserver() {
 
               client.println("<div  class='division'>"); // Div with form
               client.println("<form  method=\"GET\">");
-              client.println("<label for=\"start-time\">");
+              client.print("<div><label for=\"start-time\">");
               client.println("Watering Start:</label>");
               client.print("<input id=\"st");client.print(pump);client.print("\" type=\"time\" value=\"");
               displaytime(client,WS.pump[pump].s_hour);client.print(":");displaytime(client,WS.pump[pump].s_min);client.print(":");displaytime(client,WS.pump[pump].s_sec);client.print("\" ");
-              client.print("name=\"st");client.print(pump);client.println("\" step=\"1\"/>");
-              client.println("<label for=\"stop-time\">");
-              client.println("Watering end:</label>");
+              client.print("name=\"st");client.print(pump);client.println("\" step=\"1\"/></div><div>");
+              client.print("<label for=\"stop-time\">");
+              client.println("Watering End:</label>");
               client.print("<input id=\"et");client.print(pump);client.print("\" type=\"time\" value=\"");
               displaytime(client,WS.pump[pump].e_hour);client.print(":");displaytime(client,WS.pump[pump].e_min);client.print(":");displaytime(client,WS.pump[pump].e_sec);client.print("\" ");
-              client.print("name=\"et");client.print(pump);client.println("\" step=\"1\"/>");
+              client.print("name=\"et");client.print(pump);client.println("\" step=\"1\"/></div>");
               client.println("<div><input type=\"submit\" value=\"Submit times\" /></div>");
-              client.println("</div></div></form></div></p>");  // End of formn
+              client.println("</form></div></p>");  // End of formn
 
             }
 
