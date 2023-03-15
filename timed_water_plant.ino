@@ -51,7 +51,7 @@ bool Flag_log = true;
 int log_hour, log_min;
 
 char date_buffer[30];
-
+char up_time[30];
 // the setup function runs once when you press reset or power the board
 void setup() {
   Serial.begin(115200);
@@ -94,6 +94,7 @@ void setup() {
 
   // Display current time
   strftime(date_buffer, sizeof(date_buffer), "%Y/%m/%d %H:%M:%S", &timeinfo);
+  strftime(up_time, sizeof(up_time), "%Y/%m/%d %H:%M:%S", &timeinfo);
   Serial.println(date_buffer);
   WS.update_sensores();
 
@@ -334,9 +335,13 @@ void webserver() {
             client.println(WiFi.RSSI());
             client.println("</p>");
             strftime(date_buffer, sizeof(date_buffer), "%Y/%m/%d %H:%M:%S", &timeinfo);
-            client.println("<p>");
+            client.println("<p>Current time:");
             client.println(date_buffer);
             client.println("</p>");
+            client.println("<p>Starting time:");
+            client.println(up_time);
+            client.println("</p>");
+            
             client.println("</body></html>");
 
             // The HTTP response ends with another blank line
@@ -379,10 +384,11 @@ void google_graph(WiFiClient client) {
   }
   client.println("],");
   if (Logger.rotated) {
-    for (int t = Logger.i; t < LOG_SIZE; t++) {
+    int i = 0;
+    for (int t = Logger.i; t < LOG_SIZE; t++, i++) {
       client.print("[");
       //strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &Logger.timeLog[t]);
-      client.print(t);
+      client.print(i);
       client.print(",");
       for (int s = 0; s < SENSORS_NUM ; s++) {
         client.print(Logger.sensorLog[t][s]);
@@ -392,11 +398,11 @@ void google_graph(WiFiClient client) {
       }
       client.println("],");
     }
-    for (int t = 0 ; t < Logger.i; t++) {
+    for (int t = 0 ; t < Logger.i; t++,i++) {
       client.print("[");
       //strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &Logger.timeLog[t]);
       //client.print(date_buffer);
-      client.print(t);
+      client.print(i);
       client.print(",");
       for (int s = 0; s < SENSORS_NUM ; s++) {
         client.print(Logger.sensorLog[t][s]);
