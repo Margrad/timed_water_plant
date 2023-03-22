@@ -2,7 +2,7 @@
   Water the plants
   Create a server to monitor plants watering sensores and pumps
 */
-
+#define __DEBUG__
 #include <WiFi.h>
 #include "watering.h" // set sensores and pumps
 #include "pass.h"     // where the passwords are
@@ -150,11 +150,9 @@ void loop() {
 
 
 void webserver() {
-  //char num_buffer[17];
   WiFiClient client = server.available();   // Listen for incoming clients
 
   if (client) {                             // If a new client connects,
-    bool button_pressed = false;
     currentTime = millis();
     previousTime = currentTime;
     Serial.println("New Client.");          // print a message out in the serial port
@@ -181,57 +179,46 @@ void webserver() {
 
             if (header.indexOf("GET /P1/on") >= 0) {      // Check Pump1
               Serial.println("P1 on");
-              button_pressed = true;
               WS.pump[0].State = 1;
               WS.water_plant(0);
             } else if (header.indexOf("GET /P1/off") >= 0) {
               Serial.println("P1 off");
-              button_pressed = true;
               WS.pump[0].State = 0;
               WS.water_plant(0);
             } else if (header.indexOf("GET /P2/on") >= 0) {       // Check Pump 2
               Serial.println("P2 on");
-              button_pressed = true;
               WS.pump[1].State = 1;
               WS.water_plant(1);
             } else if (header.indexOf("GET /P2/off") >= 0) {
               Serial.println("P2 off");
-              button_pressed = true;
               WS.pump[1].State = 0;
               WS.water_plant(1);
             } else if (header.indexOf("GET /P3/on") >= 0) {       //Check Pump  P3
               Serial.println("P3 on");
-              button_pressed = true;
               WS.pump[2].State = 1;
               WS.water_plant(2);
             } else if (header.indexOf("GET /P3/off") >= 0) {
               Serial.println("P3 off");
-              button_pressed = true;
               WS.pump[2].State = 0;
               WS.water_plant(2);
             } else if (header.indexOf("GET /P4/on") >= 0) {       //Check Pump  P4
               Serial.println("P4 on");
-              button_pressed = true;
               WS.pump[3].State = 1;
               WS.water_plant(3);
             } else if (header.indexOf("GET /P5/on") >= 0) {       //Check Pump  P4
               Serial.println("P5 on");
-              button_pressed = true;
               WS.pump[4].State = 1;
               WS.water_plant(4);
             } else if (header.indexOf("GET /P4/off") >= 0) {
               Serial.println("P4 off");
-              button_pressed = true;
               WS.pump[3].State = 0;
               WS.water_plant(3);
             } else if (header.indexOf("GET /P5/off") >= 0) {
               Serial.println("P5 off");
-              button_pressed = true;
               WS.pump[4].State = 0;
               WS.water_plant(4);
             } else if (header.indexOf("GET /ALL/on") >= 0) {       //Check Pump  P4
               Serial.println("ALL on");
-              button_pressed = true;
               for (int i = 0; i < PUMPS_NUM ; i++)
               {
                 WS.pump[i].State = 1;
@@ -239,7 +226,6 @@ void webserver() {
               }
             } else if (header.indexOf("GET /ALL/off") >= 0) {
               Serial.println("ALL off");
-              button_pressed = true;
               for (int i = 0; i < PUMPS_NUM ; i++)
               {
                 WS.pump[i].State = 0;
@@ -247,7 +233,6 @@ void webserver() {
               }
             } else if (header.indexOf("GET /mail") >= 0) {
               Serial.println("sending mail...");
-              button_pressed = true;
               Logger.send_email(String("Still workin on this part"));
             }
             // Display the HTML web page
@@ -262,8 +247,8 @@ void webserver() {
             client.println(".button { background-color: #4CAF50; border: none; color: white; padding: 16px 40px;");
             client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
             client.println(".button2 {background-color: #555555;}.division {display: inline-block;padding: 0rem 1rem;}</style>");
-            if (button_pressed)
-              client.println("<meta http-equiv=\"Refresh\" content=\"0; URL='http://192.168.0.55:7531'\" /></head>");
+            //if (button_pressed)
+            //client.println("<meta http-equiv=\"Refresh\" content=\"0; URL='http://192.168.0.55:7531'\" /></head>");
             // Web Page Heading
             client.println("<body><h1>Watering the plants</h1>");
             // Display current Pump state, and ON/OFF buttons
@@ -283,18 +268,18 @@ void webserver() {
               client.println("</p>");
               client.print("<p><a href = \"/P");
               client.print(pump + 1);
-             (WS.pump[pump].State ) ? client.print("/off") : client.print("/on");
-//                client.print("/off");
-//              } else {
-//                client.print("/on");
-//              }
+              (WS.pump[pump].State ) ? client.print("/off") : client.print("/on");
+              //                client.print("/off");
+              //              } else {
+              //                client.print("/on");
+              //              }
               client.print("\"><button class=\"button");
               (WS.pump[pump].State ) ? client.print("\">OFF") : client.print(" button2\">ON");
-//              if (WS.pump[pump].State ) {
-//                client.print("\">OFF");
-//              } else {
-//                client.print(" button2\">ON");
-//              }
+              //              if (WS.pump[pump].State ) {
+              //                client.print("\">OFF");
+              //              } else {
+              //                client.print(" button2\">ON");
+              //              }
               client.println("</button></a></p>");
               client.println("</div>");  // End of button
 
@@ -302,14 +287,14 @@ void webserver() {
               client.println("<form  method=\"GET\">");
               client.print("<div><label for=\"start-time\">");
               client.println("Watering Start:</label>");
-              client.print("<input id=\"st");client.print(pump);client.print("\" type=\"time\" value=\"");
-              displaytime(client,WS.pump[pump].s_hour);client.print(":");displaytime(client,WS.pump[pump].s_min);client.print(":");displaytime(client,WS.pump[pump].s_sec);client.print("\" ");
-              client.print("name=\"st");client.print(pump);client.println("\" step=\"1\"/></div><div>");
+              client.print("<input id=\"st"); client.print(pump); client.print("\" type=\"time\" value=\"");
+              displaytime(client, WS.pump[pump].s_hour); client.print(":"); displaytime(client, WS.pump[pump].s_min); client.print(":"); displaytime(client, WS.pump[pump].s_sec); client.print("\" ");
+              client.print("name=\"st"); client.print(pump); client.println("\" step=\"1\"/></div><div>");
               client.print("<label for=\"stop-time\">");
               client.println("Watering End:</label>");
-              client.print("<input id=\"et");client.print(pump);client.print("\" type=\"time\" value=\"");
-              displaytime(client,WS.pump[pump].e_hour);client.print(":");displaytime(client,WS.pump[pump].e_min);client.print(":");displaytime(client,WS.pump[pump].e_sec);client.print("\" ");
-              client.print("name=\"et");client.print(pump);client.println("\" step=\"1\"/></div>");
+              client.print("<input id=\"et"); client.print(pump); client.print("\" type=\"time\" value=\"");
+              displaytime(client, WS.pump[pump].e_hour); client.print(":"); displaytime(client, WS.pump[pump].e_min); client.print(":"); displaytime(client, WS.pump[pump].e_sec); client.print("\" ");
+              client.print("name=\"et"); client.print(pump); client.println("\" step=\"1\"/></div>");
               client.println("<div><input type=\"submit\" value=\"Submit times\" /></div>");
               client.println("</form></div></p>");  // End of formn
 
@@ -341,7 +326,7 @@ void webserver() {
             client.println("<p>Starting time:");
             client.println(up_time);
             client.println("</p>");
-            
+
             client.println("</body></html>");
 
             // The HTTP response ends with another blank line
@@ -368,6 +353,7 @@ void webserver() {
 
 void google_graph(WiFiClient client) {
   //char date_buffer[16];
+  int t;
   client.println("<script>");
   client.println("google.charts.load('current',{packages:['corechart']});");
   client.println("google.charts.setOnLoadCallback(drawChart);");
@@ -384,11 +370,10 @@ void google_graph(WiFiClient client) {
   }
   client.println("],");
   if (Logger.rotated) {
-    int i = 0;
-    for (int t = Logger.i; t < LOG_SIZE; t++, i++) {
+    for (t = Logger.i; t < LOG_SIZE; t++) {
       client.print("[");
-      //strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &Logger.timeLog[t]);
-      client.print(i);
+      strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &Logger.timeLog[t]);
+      client.print(date_buffer);
       client.print(",");
       for (int s = 0; s < SENSORS_NUM ; s++) {
         client.print(Logger.sensorLog[t][s]);
@@ -398,11 +383,10 @@ void google_graph(WiFiClient client) {
       }
       client.println("],");
     }
-    for (int t = 0 ; t < Logger.i; t++,i++) {
+    for (t = 0 ; t < Logger.i; t++) {
       client.print("[");
-      //strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &Logger.timeLog[t]);
-      //client.print(date_buffer);
-      client.print(i);
+      strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &Logger.timeLog[t]);
+      client.print(date_buffer);
       client.print(",");
       for (int s = 0; s < SENSORS_NUM ; s++) {
         client.print(Logger.sensorLog[t][s]);
@@ -412,15 +396,16 @@ void google_graph(WiFiClient client) {
       }
       client.print("]");
       if (t < Logger.i - 1) {
-        client.println(",");
+        client.println("],");
       }
     }
+
   } else {
-    for (int t = 0 ; t < Logger.i; t++) {
+    for (t = 0 ; t <= Logger.i; t++) {
       client.print("[");
-      //strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &Logger.timeLog[t]);
-      //client.print(date_buffer);
-      client.print(t);
+      strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &Logger.timeLog[t]);
+      client.print(date_buffer);
+      //client.print(t);
       client.print(",");
       for (int s = 0; s < SENSORS_NUM ; s++) {
         client.print(Logger.sensorLog[t][s]);
@@ -446,9 +431,9 @@ void google_graph(WiFiClient client) {
   client.println("</script>");
 }
 
-void displaytime(WiFiClient client, int time){
-  if (time <10){
+void displaytime(WiFiClient client, int time) {
+  if (time < 10) {
     client.print("0");
-    }
-  client.print(time);
   }
+  client.print(time);
+}
