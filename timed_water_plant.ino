@@ -3,6 +3,7 @@
   Create a server to monitor plants watering sensores and pumps
 */
 #define __DEBUG__
+//#define __DEBUG__PLOT__
 #include <WiFi.h>
 #include "watering.h" // set sensores and pumps
 #include "pass.h"     // where the passwords are
@@ -109,6 +110,22 @@ void setup() {
     log_hour++;
   }
   if (log_hour > 23 ) log_hour = 0;
+  
+  WS.update_sensores();
+#ifdef __DEBUG__
+#ifdef __DEBUG__PLOT__
+  struct _sensor debug_sensor[SENSORS_NUM];
+  struct tm debug_time;
+  for (int i=0;i<SENSORS_NUM;i++)
+    debug_sensor[i].Value=i;
+    
+  for(int j=0;j<37;j++)
+    {
+      debug_time.tm_hour=j;
+      Logger.save_to_log(debug_time, debug_sensor);
+    }
+#endif //__DEBUG__PLOT_
+#endif // __DEBUG__  
 }
 
 
@@ -145,6 +162,7 @@ void loop() {
     }
     if (log_hour > 23 ) log_hour = 0;
   }
+
 
 }
 
@@ -354,13 +372,14 @@ void webserver() {
 void google_graph(WiFiClient client) {
   //char date_buffer[16];
   int t;
+  int s;
   client.println("<script>");
   client.println("google.charts.load('current',{packages:['corechart']});");
   client.println("google.charts.setOnLoadCallback(drawChart);");
   client.println("function drawChart() {");
   client.println("var data = google.visualization.arrayToDataTable([");
   client.print("['tempo',");
-  for (int s = 0; s < SENSORS_NUM ; s++) {
+  for (s = 0; s < SENSORS_NUM ; s++) {
     client.print("'Sensor ");
     client.print(s + 1);
     client.print("'");
@@ -375,7 +394,7 @@ void google_graph(WiFiClient client) {
       strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &Logger.timeLog[t]);
       client.print(date_buffer);
       client.print(",");
-      for (int s = 0; s < SENSORS_NUM ; s++) {
+      for (s = 0; s < SENSORS_NUM ; s++) {
         client.print(Logger.sensorLog[t][s]);
         if (s < SENSORS_NUM - 1) {
           client.print(",");
@@ -388,7 +407,7 @@ void google_graph(WiFiClient client) {
       strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &Logger.timeLog[t]);
       client.print(date_buffer);
       client.print(",");
-      for (int s = 0; s < SENSORS_NUM ; s++) {
+      for (s = 0; s < SENSORS_NUM ; s++) {
         client.print(Logger.sensorLog[t][s]);
         if (s < SENSORS_NUM - 1) {
           client.print(",");
@@ -396,18 +415,18 @@ void google_graph(WiFiClient client) {
       }
       client.print("]");
       if (t < Logger.i - 1) {
-        client.println("],");
+        client.println(",");
       }
     }
 
   } else {
-    for (t = 0 ; t <= Logger.i; t++) {
+    for (t = 0 ; t < Logger.i; t++) {
       client.print("[");
       strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &Logger.timeLog[t]);
       client.print(date_buffer);
       //client.print(t);
       client.print(",");
-      for (int s = 0; s < SENSORS_NUM ; s++) {
+      for (s = 0; s < SENSORS_NUM ; s++) {
         client.print(Logger.sensorLog[t][s]);
         if (s < SENSORS_NUM - 1) {
           client.print(",");
