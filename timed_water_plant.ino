@@ -2,9 +2,11 @@
   Water the plants
   Create a server to monitor plants watering sensores and pumps
 */
-#define __DEBUG__
+//#define __DEBUG__
 //#define __DEBUG__PLOT__
-#include <WiFi.h>
+//#include <WiFi.h>
+
+#include "WaterServer.h" // Get the server with extra methods made for the watering system
 #include "watering.h" // set sensores and pumps
 #include "pass.h"     // where the passwords are
 #include "log.h"      // sets the logging files, needs to be set after the waterings, as it uses some of the watering data
@@ -29,12 +31,11 @@ void displaytime(WiFiClient client, int time);
  * * WIFI server Set up
 */
 // Set web server port number to 7531 (easier to use a different port from 80 for port forwarding)
-WiFiServer server(7531);
+WaterServer server(PORT_NUMBER);
 String header;           // Variable to store the HTTP request
 unsigned long currentTime = millis();
 unsigned long previousTime = 0;
 const long timeoutTime = 2000; // 2s
-
 
 /*******************************************************
    Setting both classes created for this project
@@ -133,7 +134,6 @@ void setup() {
 void loop() {
 
   webserver();
-
   getLocalTime(&timeinfo);
 
   WS.TimeChecker(&timeinfo);
@@ -194,6 +194,7 @@ void webserver() {
             client.println();
 
             // turns the pumps on and off
+            server.process_header(header);
 
             if (header.indexOf("GET /P1/on") >= 0) {      // Check Pump1
               Serial.println("P1 on");
@@ -265,8 +266,6 @@ void webserver() {
             client.println(".button { background-color: #4CAF50; border: none; color: white; padding: 16px 40px;");
             client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
             client.println(".button2 {background-color: #555555;}.division {display: inline-block;padding: 0rem 1rem;}</style>");
-            //if (button_pressed)
-            //client.println("<meta http-equiv=\"Refresh\" content=\"0; URL='http://192.168.0.55:7531'\" /></head>");
             // Web Page Heading
             client.println("<body><h1>Watering the plants</h1>");
             // Display current Pump state, and ON/OFF buttons
