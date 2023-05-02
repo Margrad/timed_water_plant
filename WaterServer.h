@@ -10,7 +10,8 @@
 class WaterServer: public WiFiServer {
 
    public:
-      WaterServer(int x) : WiFiServer(x){}
+      WaterServer(int x) : WiFiServer(x){
+        }
       
       void process_header(String header);
 };

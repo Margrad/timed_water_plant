@@ -71,17 +71,10 @@ void setup() {
     Serial.print(".");
   }
   Serial.println("!");
-  //  WiFi.enableIpV6();
-  //  Serial.println("Getting IPv6");
-  //  delay(2000);
   // Print local IP address and start web server
   Serial.println("WiFi connected.");
   Serial.println("IPv4 address:");
   Serial.println(WiFi.localIP());
-  //  Serial.println("IPv6 address:");
-  //  Serial.println(WiFi.localIPv6());
-  //  Serial.print("AP IPv6: ");
-  //  Serial.println(WiFi.softAPIPv6());
   server.begin();
 
   //Get current time information
