@@ -33,7 +33,7 @@ class WateringSystem {
     int pumpPin[PUMPS_NUM] = {15, 5, 19, 21, 22};
     // auciliar watering functions
 
-
+    void update_watering_time(int, int , int , int, int, int , int);
     void init_watering();
 
     void TimeChecker(struct tm *timeinfo);

@@ -75,3 +75,15 @@ void WateringSystem::TimeChecker(struct tm *timeinfo)
     }
   }
 }
+
+
+
+void WateringSystem::update_watering_time(int pump_index, int sh, int sm, int ss, int eh, int em, int es){
+  pump[pump_index].s_hour = sh;
+  pump[pump_index].s_min = sm;
+  pump[pump_index].s_sec = ss;
+  pump[pump_index].e_hour = eh;
+  pump[pump_index].e_min = em;
+  pump[pump_index].e_sec = es;
+
+  }

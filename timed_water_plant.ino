@@ -187,7 +187,7 @@ void webserver() {
             client.println();
 
             // turns the pumps on and off
-            server.process_header(header);
+            server.process_header(header,WS);
 
             if (header.indexOf("GET /P1/on") >= 0) {      // Check Pump1
               Serial.println("P1 on");
