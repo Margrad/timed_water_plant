@@ -190,64 +190,11 @@ void webserver() {
             client.println("Connection: close");
             client.println();
 
-            // turns the pumps on and off
+            // Proceess the header to 
             server.process_header(header, &WS);
 
-            if (header.indexOf("GET /P1/on") >= 0) {      // Check Pump1
-              Serial.println("P1 on");
-              WS.pump[0].State = 1;
-              WS.water_plant(0);
-            } else if (header.indexOf("GET /P1/off") >= 0) {
-              Serial.println("P1 off");
-              WS.pump[0].State = 0;
-              WS.water_plant(0);
-            } else if (header.indexOf("GET /P2/on") >= 0) {       // Check Pump 2
-              Serial.println("P2 on");
-              WS.pump[1].State = 1;
-              WS.water_plant(1);
-            } else if (header.indexOf("GET /P2/off") >= 0) {
-              Serial.println("P2 off");
-              WS.pump[1].State = 0;
-              WS.water_plant(1);
-            } else if (header.indexOf("GET /P3/on") >= 0) {       //Check Pump  P3
-              Serial.println("P3 on");
-              WS.pump[2].State = 1;
-              WS.water_plant(2);
-            } else if (header.indexOf("GET /P3/off") >= 0) {
-              Serial.println("P3 off");
-              WS.pump[2].State = 0;
-              WS.water_plant(2);
-            } else if (header.indexOf("GET /P4/on") >= 0) {       //Check Pump  P4
-              Serial.println("P4 on");
-              WS.pump[3].State = 1;
-              WS.water_plant(3);
-            } else if (header.indexOf("GET /P5/on") >= 0) {       //Check Pump  P4
-              Serial.println("P5 on");
-              WS.pump[4].State = 1;
-              WS.water_plant(4);
-            } else if (header.indexOf("GET /P4/off") >= 0) {
-              Serial.println("P4 off");
-              WS.pump[3].State = 0;
-              WS.water_plant(3);
-            } else if (header.indexOf("GET /P5/off") >= 0) {
-              Serial.println("P5 off");
-              WS.pump[4].State = 0;
-              WS.water_plant(4);
-            } else if (header.indexOf("GET /ALL/on") >= 0) {       //Check Pump  P4
-              Serial.println("ALL on");
-              for (int i = 0; i < PUMPS_NUM ; i++)
-              {
-                WS.pump[i].State = 1;
-                WS.water_plant(i);
-              }
-            } else if (header.indexOf("GET /ALL/off") >= 0) {
-              Serial.println("ALL off");
-              for (int i = 0; i < PUMPS_NUM ; i++)
-              {
-                WS.pump[i].State = 0;
-                WS.water_plant(i);
-              }
-            } else if (header.indexOf("GET /mail") >= 0) {
+
+            if (header.indexOf("GET /mail") >= 0) {
               Serial.println("sending mail...");
               Logger.send_email(String("Still workin on this part"));
             }
@@ -262,7 +209,10 @@ void webserver() {
             client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
             client.println(".button { background-color: #4CAF50; border: none; color: white; padding: 16px 40px;");
             client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
-            client.println(".button2 {background-color: #555555;}.division {display: inline-block;padding: 0rem 1rem;}</style>");
+            client.println(".button2 {background-color: #555555;}");
+            client.println(".division {display: inline-block;padding: 0rem 1rem;}");
+            client.println(".hide {display: none;}");
+            client.println("</style>");
             // Web Page Heading
             client.println("<body><h1>Watering the plants</h1>");
             // Display current Pump state, and ON/OFF buttons
@@ -274,30 +224,41 @@ void webserver() {
             */
             for (int pump = 0; pump < PUMPS_NUM; pump++)
             {
+
+              // Creates buttons to turns the auto watering on or off
               client.print("<p><div  class='division'>"); // Div with button
               client.print("<p>Pump ");
-              client.print(pump + 1);
+              client.print(pump);
+              client.print(" - Auto ");
+              (WS.pump[pump].automatic_mode ) ? client.print("ON") : client.print("OFF");
+              client.println("</p>");
+              client.print("<p><a href = \"/Auto");
+              client.print(pump);
+              (WS.pump[pump].automatic_mode ) ? client.print("/off") : client.print("/on");
+              client.print("\"><button class=\"button");
+              (WS.pump[pump].automatic_mode ) ? client.print("\">OFF") : client.print(" button2\">ON");
+              client.println("</button></a></p>");              
+              client.println("</div>");  // End of button
+              
+              // Creates buttons to turn a pump on of off
+              client.print("<div  class='division"); // Div with button
+              (WS.pump[pump].automatic_mode ) ? client.print(" hide'>") : client.print("'>");
+              client.print("<p>Pump ");
+              client.print(pump);
               client.print(" - State ");
               (WS.pump[pump].State ) ? client.print("ON") : client.print("OFF");
               client.println("</p>");
               client.print("<p><a href = \"/P");
-              client.print(pump + 1);
+              client.print(pump);
               (WS.pump[pump].State ) ? client.print("/off") : client.print("/on");
-              //                client.print("/off");
-              //              } else {
-              //                client.print("/on");
-              //              }
               client.print("\"><button class=\"button");
               (WS.pump[pump].State ) ? client.print("\">OFF") : client.print(" button2\">ON");
-              //              if (WS.pump[pump].State ) {
-              //                client.print("\">OFF");
-              //              } else {
-              //                client.print(" button2\">ON");
-              //              }
-              client.println("</button></a></p>");
+              client.println("</button></a></p>");     
               client.println("</div>");  // End of button
 
-              client.println("<div  class='division'>"); // Div with form
+
+              // Creates time controllers
+              client.print("<div  class='division'>"); // Div with form
               client.println("<form  method=\"GET\">");
               client.print("<div><label for=\"start-time\">");
               client.println("Watering Start:</label>");

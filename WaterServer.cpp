@@ -3,13 +3,12 @@
 
 
 void WaterServer::process_header(String header, WateringSystem *WS) {
+  int pump_index;
+  int sh, sm, ss; // S for Start, E for End :  h ->hour, m ->minutes, s -> seconds
+  int eh, em, es;
+
   int index = header.indexOf("?st");
-  if ( index < 2 )
-    return;
-  else {
-    int pump_index;
-    int sh, sm, ss; // S for Start, E for End :  h ->hour, m ->minutes, s -> seconds
-    int eh, em, es;
+  if ( index >= 2 ) {
     pump_index = (int)header[index + 3] - '0';
     sh = (int)(header[index + 5] - '0') * 10 + header[index + 6] - '0';
     sm = (int)(header[index + 10] - '0') * 10 + header[index + 11] - '0';
@@ -31,6 +30,55 @@ void WaterServer::process_header(String header, WateringSystem *WS) {
     WS->update_watering_time( pump_index, sh,  sm,  ss,  eh,  em,  es);
     return;
   }
+  index = header.indexOf("/P");
+  if ( index >= 0 )
+  {
+    pump_index = (int)header[index + 2] - '0';
+    if (header[index + 4] == 'o' && header[index + 5] == 'n')
+    {
+      WS->pump[pump_index].State = 1;
+      WS->water_plant(pump_index);
+    }
+    else if (header[index + 4] == 'o' && header[index + 5] == 'f' && header[index + 6] == 'f')
+    {
+      WS->pump[pump_index].State = 0;
+      WS->water_plant(pump_index);
+    }
+  }
 
+  index = header.indexOf("/ALL");
+  if ( index >= 0 )
+  {
+    if (header[index + 5] == 'o' && header[index + 6] == 'n')
+    {
+      for (int i = 0; i < PUMPS_NUM ; i++)
+      {
+        WS->pump[i].State = 1;
+        WS->water_plant(i);
+      }
+    }
+    else if (header[index + 5] == 'o' && header[index + 6] == 'f' && header[index + 7] == 'f')
+    {
+      for (int i = 0; i < PUMPS_NUM ; i++)
+      {
+        WS->pump[i].State = 0;
+        WS->water_plant(i);
+      }
+    }
+  }
+
+  index = header.indexOf("/Auto");
+  if ( index >= 0 )
+  {
+    pump_index = (int)header[index + 5] - '0';
+    if (header[index + 7] == 'o' && header[index + 8] == 'n')
+    {
+      WS->pump[pump_index].automatic_mode = 1;
+    }
+    else if (header[index + 7] == 'o' && header[index + 8] == 'f' && header[index + 9] == 'f')
+    {
+      WS->pump[pump_index].automatic_mode = 0;
+    }
+  }
 
 }
