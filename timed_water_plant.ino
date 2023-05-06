@@ -54,14 +54,14 @@ int log_hour, log_min;
 
 char date_buffer[30];
 char up_time[30];
+
+
 // the setup function runs once when you press reset or power the board
 void setup() {
   Serial.begin(115200);
   analogReadResolution(12);
-
-  // Initialize the Watering system
+ // Initialize the Watering system
   WS.init_watering();
-
   // Connect to Wi-Fi network with SSID and password
   Serial.print("Connecting to ");
   Serial.println(WIFI_SSID );
@@ -120,6 +120,10 @@ void setup() {
     }
 #endif //__DEBUG__PLOT_
 #endif // __DEBUG__  
+
+
+
+
 }
 
 
@@ -187,7 +191,7 @@ void webserver() {
             client.println();
 
             // turns the pumps on and off
-            server.process_header(header,WS);
+            server.process_header(header, &WS);
 
             if (header.indexOf("GET /P1/on") >= 0) {      // Check Pump1
               Serial.println("P1 on");

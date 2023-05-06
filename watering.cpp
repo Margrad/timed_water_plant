@@ -22,10 +22,6 @@ void WateringSystem::init_watering() {
     pump[i].automatic_mode = true;
   }
 
-  pump[3].e_sec = 7;
-  pump[4].s_min = 40;
-  pump[4].e_min = 45;
-
 }
 
 void WateringSystem::water_plant(int pumpIndex) {
@@ -77,7 +73,6 @@ void WateringSystem::TimeChecker(struct tm *timeinfo)
 }
 
 
-
 void WateringSystem::update_watering_time(int pump_index, int sh, int sm, int ss, int eh, int em, int es){
   pump[pump_index].s_hour = sh;
   pump[pump_index].s_min = sm;
@@ -85,5 +80,4 @@ void WateringSystem::update_watering_time(int pump_index, int sh, int sm, int ss
   pump[pump_index].e_hour = eh;
   pump[pump_index].e_min = em;
   pump[pump_index].e_sec = es;
-
   }

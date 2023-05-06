@@ -13,7 +13,7 @@ class WaterServer: public WiFiServer {
       WaterServer(int x) : WiFiServer(x){
         }
       
-      void process_header(String header, WateringSystem WS);
+      void process_header(String header, WateringSystem *WS);
 };
 
 

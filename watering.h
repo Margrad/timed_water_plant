@@ -34,6 +34,7 @@ class WateringSystem {
     // auciliar watering functions
 
     void update_watering_time(int, int , int , int, int, int , int);
+    void SerialPrintWaterTimings();
     void init_watering();
 
     void TimeChecker(struct tm *timeinfo);
