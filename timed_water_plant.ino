@@ -278,6 +278,8 @@ void webserver() {
             client.println("<h1>Set all Pumps</h1>");
             client.println("<p><a href=\"/ALL/off\"><button class=\"button button2\">Set all OFF</button></a></p>");
             client.println("<p><a href=\"/ALL/on\"><button class=\"button button2\"> Set all ON</button></a></p>");
+            client.println("<p><a href=\"/AutoA/off\"><button class=\"button button2\">Turn OFF ALL Auto watering</button></a></p>");
+            client.println("<p><a href=\"/AutoA/on\"><button class=\"button button2\">Turn ON ALL Auto watering</button></a></p>");
             client.println("<p><a href=\"/mail\"><button class=\"button button2\"> Send email</button></a></p>");
 
             client.println("<h1>Sensors:</h1>");
