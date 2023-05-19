@@ -230,19 +230,19 @@ void webserver() {
               client.print("<p>Pump ");
               client.print(pump);
               client.print(" - Auto ");
-              (WS.pump[pump].automatic_mode ) ? client.print("ON") : client.print("OFF");
+              (WS.pump[pump].automatic_timer_mode ) ? client.print("ON") : client.print("OFF");
               client.println("</p>");
               client.print("<p><a href = \"/Auto");
               client.print(pump);
-              (WS.pump[pump].automatic_mode ) ? client.print("/off") : client.print("/on");
+              (WS.pump[pump].automatic_timer_mode ) ? client.print("/off") : client.print("/on");
               client.print("\"><button class=\"button");
-              (WS.pump[pump].automatic_mode ) ? client.print("\">OFF") : client.print(" button2\">ON");
+              (WS.pump[pump].automatic_timer_mode ) ? client.print("\">OFF") : client.print(" button2\">ON");
               client.println("</button></a></p>");              
               client.println("</div>");  // End of button
               
               // Creates buttons to turn a pump on of off
               client.print("<div  class='division"); // Div with button
-              (WS.pump[pump].automatic_mode ) ? client.print(" hide'>") : client.print("'>");
+              (WS.pump[pump].automatic_timer_mode ) ? client.print(" hide'>") : client.print("'>");
               client.print("<p>Pump ");
               client.print(pump);
               client.print(" - State ");

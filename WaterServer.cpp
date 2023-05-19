@@ -44,7 +44,7 @@ void WaterServer::process_header(String header, WateringSystem *WS) {
   {
     pump_index = (int)header[index + 2] - '0';
     if (pump_index < 0 || pump_index >= PUMPS_NUM) return; // checks for correct pump number
-    if (WS->pump[pump_index].automatic_mode ) return; // if Automatic mode is on, ignore this command
+    if (WS->pump[pump_index].automatic_timer_mode ) return; // if Automatic mode is on, ignore this command
     if (header[index + 4] == 'o' && header[index + 5] == 'n')
     {
       WS->pump[pump_index].State = 1;
@@ -68,7 +68,7 @@ void WaterServer::process_header(String header, WateringSystem *WS) {
       for (int i = 0; i < PUMPS_NUM ; i++)
       {
         Serial.print(i);
-        if (WS->pump[i].automatic_mode ) continue; // if Automatic mode is on, jump this pump
+        if (WS->pump[i].automatic_timer_mode ) continue; // if Automatic mode is on, jump this pump
         Serial.println(i);
         WS->pump[i].State = 1;
         WS->water_plant(i);
@@ -80,7 +80,7 @@ void WaterServer::process_header(String header, WateringSystem *WS) {
       for (int i = 0; i < PUMPS_NUM ; i++)
       {
         Serial.print(i);
-        if (WS->pump[i].automatic_mode ) continue;// if Automatic mode is on, jump this pump
+        if (WS->pump[i].automatic_timer_mode ) continue;// if Automatic mode is on, jump this pump
         Serial.println(i);
         WS->pump[i].State = 0;
         WS->water_plant(i);
@@ -98,7 +98,7 @@ void WaterServer::process_header(String header, WateringSystem *WS) {
       {
         for (int i = 0; i < PUMPS_NUM ; i++)
         {
-          WS->pump[i].automatic_mode = 1;
+          WS->pump[i].automatic_timer_mode = 1;
           WS->pump[i].State = 0;
           WS->water_plant(i);
         }
@@ -108,7 +108,7 @@ void WaterServer::process_header(String header, WateringSystem *WS) {
       {
         for (int i = 0; i < PUMPS_NUM ; i++)
         {
-          WS->pump[i].automatic_mode = 0;
+          WS->pump[i].automatic_timer_mode = 0;
           WS->pump[i].State = 0;
           WS->water_plant(i);
         }
@@ -119,13 +119,13 @@ void WaterServer::process_header(String header, WateringSystem *WS) {
     if (pump_index < 0 || pump_index >= PUMPS_NUM) return;
     if (header[index + 7] == 'o' && header[index + 8] == 'n')
     {
-      WS->pump[pump_index].automatic_mode = 1;
+      WS->pump[pump_index].automatic_timer_mode = 1;
       WS->pump[pump_index].State = 0;
       WS->water_plant(pump_index);
     }
     else if (header[index + 7] == 'o' && header[index + 8] == 'f' && header[index + 9] == 'f')
     {
-      WS->pump[pump_index].automatic_mode = 0;
+      WS->pump[pump_index].automatic_timer_mode = 0;
       WS->pump[pump_index].State = 0;
       WS->water_plant(pump_index);
     }
