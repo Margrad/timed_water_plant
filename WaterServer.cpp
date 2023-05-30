@@ -18,6 +18,22 @@ void WaterServer::process_header(String header, WateringSystem *WS) {
 
   int index = header.indexOf("?st");
   if ( index >= 2 && index < 25) {
+    // Check if index values are actuall numbers
+    if ((header[index + 5] < '0') || (header[index + 5] > '9') || 
+          (header[index + 6] < '0') || (header[index + 6] > '9') || 
+          (header[index + 10] < '0') || (header[index + 10] > '9') || 
+          (header[index + 11] < '0') || (header[index + 11] > '9') || 
+          (header[index + 15] < '0') || (header[index + 15] > '9') || 
+          (header[index + 16] < '0') || (header[index + 16] > '9') || 
+          (header[index + 22] < '0') || (header[index + 22] > '9') || 
+          (header[index + 23] < '0') || (header[index + 23] > '9') || 
+          (header[index + 27] < '0') || (header[index + 27] > '9') || 
+          (header[index + 28] < '0') || (header[index + 28] > '9') || 
+          (header[index + 32] < '0') || (header[index + 32] > '9') || 
+          (header[index + 33] < '0') || (header[index + 33] > '9')) {
+            Serial.print("Issue with timming: new value is not a number");
+            return;}
+          
     pump_index = (int)header[index + 3] - '0';
     sh = (int)(header[index + 5] - '0') * 10 + header[index + 6] - '0';
     sm = (int)(header[index + 10] - '0') * 10 + header[index + 11] - '0';
@@ -27,8 +43,11 @@ void WaterServer::process_header(String header, WateringSystem *WS) {
     es = (int)(header[index + 32] - '0') * 10 + header[index + 33] - '0';
 
     //protect from incorrect time used or pump
-    if (pump_index < 0 || pump_index >= PUMPS_NUM)
-      return;
+    if (pump_index < 0 || pump_index >= PUMPS_NUM){
+      Serial.print("Issue with Pump number: ");
+      Serial.print(pump_index);
+      Serial.println(" is outside the expected number of pumps");
+      return;}
     if (sh < 0 || sh >= 24 || eh < 0 || eh >= 24 )
       return;
     if (sm < 0 || sm >= 60 || em < 0 || em >= 60 )
@@ -43,7 +62,11 @@ void WaterServer::process_header(String header, WateringSystem *WS) {
   if ( index >= 0 && index < 25)
   {
     pump_index = (int)header[index + 2] - '0';
-    if (pump_index < 0 || pump_index >= PUMPS_NUM) return; // checks for correct pump number
+    if (pump_index < 0 || pump_index >= PUMPS_NUM){
+      Serial.print("Issue with Pump number: ");
+      Serial.print(pump_index);
+      Serial.println(" is outside the expected number of pumps");
+      return;} // checks for correct pump number
     if (WS->pump[pump_index].automatic_timer_mode ) return; // if Automatic mode is on, ignore this command
     if (header[index + 4] == 'o' && header[index + 5] == 'n')
     {
@@ -116,7 +139,11 @@ void WaterServer::process_header(String header, WateringSystem *WS) {
       }
     }
     pump_index = (int)header[index + 5] - '0';
-    if (pump_index < 0 || pump_index >= PUMPS_NUM) return;
+    if (pump_index < 0 || pump_index >= PUMPS_NUM){
+      Serial.print("Issue with Pump number: ");
+      Serial.print(pump_index);
+      Serial.println(" is outside the expected number of pumps");
+      return;}
     if (header[index + 7] == 'o' && header[index + 8] == 'n')
     {
       WS->pump[pump_index].automatic_timer_mode = 1;
