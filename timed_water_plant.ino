@@ -230,19 +230,19 @@ void webserver() {
               client.print("<p>Pump ");
               client.print(pump);
               client.print(" - Auto ");
-              (WS.pump[pump].automatic_mode ) ? client.print("ON") : client.print("OFF");
+              (WS.pump[pump].automatic_timer_mode ) ? client.print("ON") : client.print("OFF");
               client.println("</p>");
               client.print("<p><a href = \"/Auto");
               client.print(pump);
-              (WS.pump[pump].automatic_mode ) ? client.print("/off") : client.print("/on");
+              (WS.pump[pump].automatic_timer_mode ) ? client.print("/off") : client.print("/on");
               client.print("\"><button class=\"button");
-              (WS.pump[pump].automatic_mode ) ? client.print("\">OFF") : client.print(" button2\">ON");
+              (WS.pump[pump].automatic_timer_mode ) ? client.print("\">OFF") : client.print(" button2\">ON");
               client.println("</button></a></p>");              
               client.println("</div>");  // End of button
               
               // Creates buttons to turn a pump on of off
               client.print("<div  class='division"); // Div with button
-              (WS.pump[pump].automatic_mode ) ? client.print(" hide'>") : client.print("'>");
+              (WS.pump[pump].automatic_timer_mode ) ? client.print(" hide'>") : client.print("'>");
               client.print("<p>Pump ");
               client.print(pump);
               client.print(" - State ");
@@ -278,6 +278,8 @@ void webserver() {
             client.println("<h1>Set all Pumps</h1>");
             client.println("<p><a href=\"/ALL/off\"><button class=\"button button2\">Set all OFF</button></a></p>");
             client.println("<p><a href=\"/ALL/on\"><button class=\"button button2\"> Set all ON</button></a></p>");
+            client.println("<p><a href=\"/AutoA/off\"><button class=\"button button2\">Turn OFF ALL Auto watering</button></a></p>");
+            client.println("<p><a href=\"/AutoA/on\"><button class=\"button button2\">Turn ON ALL Auto watering</button></a></p>");
             client.println("<p><a href=\"/mail\"><button class=\"button button2\"> Send email</button></a></p>");
 
             client.println("<h1>Sensors:</h1>");
