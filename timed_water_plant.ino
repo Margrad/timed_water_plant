@@ -172,6 +172,7 @@ void webserver() {
     previousTime = currentTime;
     Serial.println("New Client.");          // print a message out in the serial port
     String currentLine = "";                // make a String to hold incoming data from the client
+    String POST_line = "";                  // make a string to holde the POST information
     while (client.connected() && currentTime - previousTime <= timeoutTime) {  // loop while the client's connected
       WS.update_sensores();
       currentTime = millis();
@@ -182,7 +183,29 @@ void webserver() {
         if (c == '\n') {                    // if the byte is a newline character
           // if the current line is blank, you got two newline characters in a row.
           // that's the end of the client HTTP request, so send a response:
+          
           if (currentLine.length() == 0) {
+
+
+            //Check if it's a POST 
+            if (header.indexOf("POST") == 0){
+                int index = header.indexOf("Content-Length:")+16;
+                char temp = header[index];
+                String number = "";
+                while (temp != '\n'){
+                  number += temp;
+                  index++;
+                  temp = header[index];
+                  }
+                int Content_Length = number.toInt();
+            Serial.println(Content_Length);
+                POST_line = "";
+                for(int i = 0; i< Content_Length ; i++){
+                  POST_line += char (client.read());
+                  } 
+            Serial.println(POST_line);
+            }
+            
             // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
             // and a content-type so the client knows what's coming, then a blank line:
             client.println("HTTP/1.1 200 OK");
@@ -218,6 +241,17 @@ void webserver() {
             // Display current Pump state, and ON/OFF buttons
             // If the Pump is off, it displays the ON button
 
+/*
+ * Create POST test
+ */
+
+            client.println("<form method=\"post\">");
+            client.println("<label for=\"option1\">Option 1:</label>");
+            client.println("<input type=\"text\" id=\"fname\" name=\"fname\"><br><br>");
+            client.println("<label for=\"option2\">Option 2:</label>");
+            client.println("<input type=\"text\" id=\"lname\" name=\"lname\"><br><br>");
+            client.println("<input type=\"submit\" value=\"Submit\">");
+            client.println("</form>");
 
             /*
                Print Pump config
@@ -255,6 +289,7 @@ void webserver() {
               (WS.pump[pump].State ) ? client.print("\">OFF") : client.print(" button2\">ON");
               client.println("</button></a></p>");     
               client.println("</div>");  // End of button
+               
 
 
               // Creates time controllers
