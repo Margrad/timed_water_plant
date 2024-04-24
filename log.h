@@ -7,7 +7,7 @@
 
 #define SMTP_PORT 465
 #define SMTP_HOST  "smtp.gmail.com"
-#define LOG_SIZE 36
+#define LOG_SIZE 128
 
 class MyLog {
   private:

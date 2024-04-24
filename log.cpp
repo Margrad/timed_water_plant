@@ -145,7 +145,7 @@ void MyLog::save_to_log(struct tm tempo, struct _sensor *sensores) {
       LOG += date_buffer;
       LOG += ",";
       for (int s = 0; s < SENSORS_NUM ; s++) {
-        LOG += String(sensorLog[t][s]);
+        LOG += "\"" + String(sensorLog[t][s]) + "\"";
         if (s < SENSORS_NUM - 1) {
           LOG += ",";
         }

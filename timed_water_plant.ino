@@ -8,7 +8,7 @@
 
 #include "WaterServer.h" // Get the server with extra methods made for the watering system
 #include "watering.h" // set sensores and pumps
-#include "pass.h"     // where the passwords are
+#include "pass.h"     // where the passwords are you will need to create this file yourselfe
 #include "log.h"      // sets the logging files, needs to be set after the waterings, as it uses some of the watering data
 
 /* The sign in credentials present in pass.h
@@ -238,13 +238,11 @@ void webserver() {
             client.println("</style>");
             // Web Page Heading
             client.println("<body><h1>Watering the plants</h1>");
-            // Display current Pump state, and ON/OFF buttons
-            // If the Pump is off, it displays the ON button
+
 
 /*
  * Create POST test
  */
-
             client.println("<form method=\"post\">");
             client.println("<label for=\"option1\">Option 1:</label>");
             client.println("<input type=\"text\" id=\"fname\" name=\"fname\"><br><br>");
@@ -255,6 +253,8 @@ void webserver() {
 
             /*
                Print Pump config
+            // Display current Pump state, and ON/OFF buttons
+            // If the Pump is off, it displays the ON button
             */
             for (int pump = 0; pump < PUMPS_NUM; pump++)
             {
