@@ -204,7 +204,27 @@ void webserver() {
                   POST_line += char (client.read());
                   } 
             Serial.println(POST_line);
+            
+            client.println("HTTP/1.1 200 OK");
+            client.println("Content-type:text/html");
+            client.println("Connection: close");
+            client.println();
+                        
+            client.println("<!DOCTYPE html><html><head><meta http-equiv=\"refresh\" content=\"1\"></head></html>");
+            client.println();
+            header = "";
+            client.stop();  
+            return;     
             }
+
+
+
+
+
+
+
+  
+
             
             // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
             // and a content-type so the client knows what's coming, then a blank line:
@@ -219,7 +239,7 @@ void webserver() {
 
             if (header.indexOf("GET /mail") >= 0) {
               Serial.println("sending mail...");
-              Logger.send_email(String("Still workin on this part"));
+              Logger.send_email(Logger.prepare_log_to_email());
             }
             // Display the HTML web page
             client.println("<!DOCTYPE html><html>");

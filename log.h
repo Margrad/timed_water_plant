@@ -27,7 +27,7 @@ class MyLog {
       }
     }
 
-
+    String prepare_log_to_email();
     void save_to_log(struct tm, struct _sensor*);
     void send_email(String);
     void print_from_log();

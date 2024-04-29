@@ -119,7 +119,6 @@ void MyLog::send_email(String textMsg) {
 
 
 void MyLog::save_to_log(struct tm tempo, struct _sensor *sensores) {
-  char date_buffer[10];
   timeLog[i] = tempo;
   for (int s = 0 ; s < SENSORS_NUM; s++)
     sensorLog[i][s] = sensores[s].Value;
@@ -127,37 +126,46 @@ void MyLog::save_to_log(struct tm tempo, struct _sensor *sensores) {
   if (i == LOG_SIZE) {
     rotated = true;
     i = 0;
-    String LOG = "[";
-    LOG += "['tempo',";
+    send_email(prepare_log_to_email());
+  }
+};
+
+
+String MyLog::prepare_log_to_email() {
+  char date_buffer[10];
+  String LOG = "[";
+  LOG += "['tempo',";
+  for (int s = 0; s < SENSORS_NUM ; s++) {
+    LOG += "'Sensor ";
+    LOG += String(s + 1);
+    LOG += "'";
+    if (s < SENSORS_NUM - 1) {
+      LOG += ",";
+    }
+  }
+
+  LOG += "],\n";
+  for (int t = 0 ; t < LOG_SIZE; t++) {
+    LOG += "[";
+    strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &timeLog[t]);
+    LOG += '\"';
+    LOG += date_buffer;
+    LOG += '\"';
+    LOG += ",";
     for (int s = 0; s < SENSORS_NUM ; s++) {
-      LOG += "'Sensor ";
-      LOG += String(s + 1);
-      LOG += "'";
+      LOG +=  String(sensorLog[t][s]);
       if (s < SENSORS_NUM - 1) {
         LOG += ",";
       }
     }
-
-    LOG += "],\n";
-    for (int t = 0 ; t < LOG_SIZE; t++) {
-      LOG += "[";
-      strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &timeLog[t]);
-      LOG += date_buffer;
-      LOG += ",";
-      for (int s = 0; s < SENSORS_NUM ; s++) {
-        LOG += "\"" + String(sensorLog[t][s]) + "\"";
-        if (s < SENSORS_NUM - 1) {
-          LOG += ",";
-        }
-      }
-      LOG += "]";
-      if (t < LOG_SIZE - 1) {
-        LOG += ",\n";
-      }
-      // LOG += "";
-    }
     LOG += "]";
-
-    send_email(LOG);
+    if (t < LOG_SIZE - 1) {
+      LOG += ",\n";
+    }
+    // LOG += "";
   }
-};
+  LOG += "]";
+
+  return LOG;
+
+}
