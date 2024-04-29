@@ -25,8 +25,8 @@
 
 
 void webserver();
-void google_graph(WiFiClient client);
-void displaytime(WiFiClient client, int time);
+void google_graph(WiFiClient *client);
+void displaytime(WiFiClient *client, int time);
 /* ***********************************************
  * * WIFI server Set up
 */
@@ -121,9 +121,6 @@ void setup() {
 #endif //__DEBUG__PLOT_
 #endif // __DEBUG__  
 
-
-
-
 }
 
 
@@ -159,9 +156,8 @@ void loop() {
     }
     if (log_hour > 23 ) log_hour = 0;
   }
-
-
 }
+
 
 
 void webserver() {
@@ -185,7 +181,6 @@ void webserver() {
           // that's the end of the client HTTP request, so send a response:
           
           if (currentLine.length() == 0) {
-
 
             //Check if it's a POST 
             if (header.indexOf("POST") == 0){
@@ -217,13 +212,6 @@ void webserver() {
             return;     
             }
 
-
-
-
-
-
-
-  
 
             
             // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
@@ -263,6 +251,7 @@ void webserver() {
 /*
  * Create POST test
  */
+#ifdef __DEBUG__
             client.println("<form method=\"post\">");
             client.println("<label for=\"option1\">Option 1:</label>");
             client.println("<input type=\"text\" id=\"fname\" name=\"fname\"><br><br>");
@@ -270,7 +259,7 @@ void webserver() {
             client.println("<input type=\"text\" id=\"lname\" name=\"lname\"><br><br>");
             client.println("<input type=\"submit\" value=\"Submit\">");
             client.println("</form>");
-
+#endif  //__DEBUG__
             /*
                Print Pump config
             // Display current Pump state, and ON/OFF buttons
@@ -318,12 +307,12 @@ void webserver() {
               client.print("<div><label for=\"start-time\">");
               client.println("Watering Start:</label>");
               client.print("<input id=\"st"); client.print(pump); client.print("\" type=\"time\" value=\"");
-              displaytime(client, WS.pump[pump].s_hour); client.print(":"); displaytime(client, WS.pump[pump].s_min); client.print(":"); displaytime(client, WS.pump[pump].s_sec); client.print("\" ");
+              displaytime(&client, WS.pump[pump].s_hour); client.print(":"); displaytime(&client, WS.pump[pump].s_min); client.print(":"); displaytime(&client, WS.pump[pump].s_sec); client.print("\" ");
               client.print("name=\"st"); client.print(pump); client.println("\" step=\"1\"/></div><div>");
               client.print("<label for=\"stop-time\">");
               client.println("Watering End:</label>");
               client.print("<input id=\"et"); client.print(pump); client.print("\" type=\"time\" value=\"");
-              displaytime(client, WS.pump[pump].e_hour); client.print(":"); displaytime(client, WS.pump[pump].e_min); client.print(":"); displaytime(client, WS.pump[pump].e_sec); client.print("\" ");
+              displaytime(&client, WS.pump[pump].e_hour); client.print(":"); displaytime(&client, WS.pump[pump].e_min); client.print(":"); displaytime(&client, WS.pump[pump].e_sec); client.print("\" ");
               client.print("name=\"et"); client.print(pump); client.println("\" step=\"1\"/></div>");
               client.println("<div><input type=\"submit\" value=\"Submit times\" /></div>");
               client.println("</form></div></p>");  // End of formn
@@ -346,7 +335,7 @@ void webserver() {
               client.println("</p>");
             }
             client.println("<div id=\"myChart\" style=\"width:100%; max-width:600px; height:500px;\"></div> ");
-            google_graph(client);
+            google_graph(&client);
 
             client.println("<p> WIFI Strength");
             client.println(WiFi.RSSI());
@@ -383,90 +372,90 @@ void webserver() {
 }
 
 
-void google_graph(WiFiClient client) {
+void google_graph(WiFiClient *client) {
   //char date_buffer[16];
   int t;
   int s;
-  client.println("<script>");
-  client.println("google.charts.load('current',{packages:['corechart']});");
-  client.println("google.charts.setOnLoadCallback(drawChart);");
-  client.println("function drawChart() {");
-  client.println("var data = google.visualization.arrayToDataTable([");
-  client.print("['tempo',");
+  client->println("<script>");
+  client->println("google.charts.load('current',{packages:['corechart']});");
+  client->println("google.charts.setOnLoadCallback(drawChart);");
+  client->println("function drawChart() {");
+  client->println("var data = google.visualization.arrayToDataTable([");
+  client->print("['tempo',");
   for (s = 0; s < SENSORS_NUM ; s++) {
-    client.print("'Sensor ");
-    client.print(s + 1);
-    client.print("'");
+    client->print("'Sensor ");
+    client->print(s + 1);
+    client->print("'");
     if (s < SENSORS_NUM - 1) {
-      client.print(",");
+      client->print(",");
     }
   }
-  client.println("],");
+  client->println("],");
   if (Logger.rotated) {
     for (t = Logger.i; t < LOG_SIZE; t++) {
-      client.print("[");
+      client->print("[");
       strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &Logger.timeLog[t]);
-      client.print(date_buffer);
-      client.print(",");
+      client->print(date_buffer);
+      client->print(",");
       for (s = 0; s < SENSORS_NUM ; s++) {
-        client.print(Logger.sensorLog[t][s]);
+        client->print(Logger.sensorLog[t][s]);
         if (s < SENSORS_NUM - 1) {
-          client.print(",");
+          client->print(",");
         }
       }
-      client.println("],");
+      client->println("],");
     }
     for (t = 0 ; t < Logger.i; t++) {
-      client.print("[");
+      client->print("[");
       strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &Logger.timeLog[t]);
-      client.print(date_buffer);
-      client.print(",");
+      client->print(date_buffer);
+      client->print(",");
       for (s = 0; s < SENSORS_NUM ; s++) {
-        client.print(Logger.sensorLog[t][s]);
+        client->print(Logger.sensorLog[t][s]);
         if (s < SENSORS_NUM - 1) {
-          client.print(",");
+          client->print(",");
         }
       }
-      client.print("]");
+      client->print("]");
       if (t < Logger.i - 1) {
-        client.println(",");
+        client->println(",");
       }
     }
 
   } else {
     for (t = 0 ; t < Logger.i; t++) {
-      client.print("[");
+      client->print("[");
       strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &Logger.timeLog[t]);
-      client.print(date_buffer);
+      client->print(date_buffer);
       //client.print(t);
-      client.print(",");
+      client->print(",");
       for (s = 0; s < SENSORS_NUM ; s++) {
-        client.print(Logger.sensorLog[t][s]);
+        client->print(Logger.sensorLog[t][s]);
         if (s < SENSORS_NUM - 1) {
-          client.print(",");
+          client->print(",");
         }
       }
-      client.print("]");
+      client->print("]");
       if (t < Logger.i - 1) {
-        client.println(",");
+        client->println(",");
       }
     }
   }
 
-  client.println("]);");
-  client.println("var options = {");
-  client.println("title: 'Soil Humidy Sensors',");
-  client.println("hAxis: {title: 'Time'},");
-  client.println("vAxis: {title: 'Humidity'},");
-  client.println("legend: 'none'};");
-  client.println("var chart = new google.visualization.LineChart(document.getElementById('myChart'));");
-  client.println("chart.draw(data, options);}");
-  client.println("</script>");
+  client->println("]);");
+  client->println("var options = {");
+  client->println("title: 'Soil Humidy Sensors',");
+  client->println("hAxis: {title: 'Time'},");
+  client->println("vAxis: {title: 'Humidity'},");
+  client->println("legend: 'none'};");
+  client->println("var chart = new google.visualization.LineChart(document.getElementById('myChart'));");
+  client->println("chart.draw(data, options);}");
+  client->println("</script>");
 }
 
-void displaytime(WiFiClient client, int time) {
+void displaytime(WiFiClient *client, int time) {
   if (time < 10) {
-    client.print("0");
+    client->print("0");
   }
-  client.print(time);
+  client->print(time);
 }
