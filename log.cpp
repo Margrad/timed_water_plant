@@ -132,6 +132,9 @@ void MyLog::save_to_log(struct tm tempo, struct _sensor *sensores) {
 
 
 String MyLog::prepare_log_to_email() {
+/*
+ Function to turn the information on the logger into a String that can be emailed.
+*/ 
   char date_buffer[10];
   String LOG = "[";
   LOG += "['tempo',";
