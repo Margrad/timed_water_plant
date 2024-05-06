@@ -11,7 +11,7 @@ void MyLog::send_email(String textMsg) {
   session.login.email = AUTHOR_EMAIL;
   session.login.password = AUTHOR_PASSWORD;
   session.login.user_domain = "";
-  session.time.ntp_server = F("pool.ntp.org,time.nist.gov");
+  session.time.ntp_server = "pool.ntp.org,time.nist.gov";
   session.time.gmt_offset = 0;
   session.time.day_light_offset = 0;
 
@@ -19,9 +19,9 @@ void MyLog::send_email(String textMsg) {
   SMTP_Message message;
 
   /* Set the message headers */
-  message.sender.name = F("Watering System"); // This witll be used with 'MAIL FROM' command and 'From' header field.
+  message.sender.name = "Watering System"; // This witll be used with 'MAIL FROM' command and 'From' header field.
   message.sender.email = AUTHOR_EMAIL; // This witll be used with 'From' header field.
-  message.subject = F("Water System Report");
+  message.subject = "Water System Report";
   message.addRecipient("Marco", RECIPIENT_EMAIL); // This will be used with RCPT TO command and 'To' header field.
 
   //String textMsg = "This is simple plain text message";
@@ -47,7 +47,7 @@ void MyLog::send_email(String textMsg) {
      utf-7
      The default value is utf-8
   */
-  message.text.charSet = F("us-ascii");
+  message.text.charSet = "us-ascii";
 
   /** The content transfer encoding e.g.
      enc_7bit or "7bit" (not encoded)
@@ -84,7 +84,7 @@ void MyLog::send_email(String textMsg) {
   message.response.notify = esp_mail_smtp_notify_success | esp_mail_smtp_notify_failure | esp_mail_smtp_notify_delay;
 
   /* Set the custom message header */
-  //message.addHeader(F("Message-ID: <abcde.fghij@gmail.com>"));
+  //message.addHeader("Message-ID: <abcde.fghij@gmail.com>");
 
   // For Root CA certificate verification (ESP8266 and ESP32 only)
   // session.certificate.cert_data = rootCACert;
