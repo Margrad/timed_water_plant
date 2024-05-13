@@ -199,6 +199,7 @@ void webserver() {
                   POST_line += char (client.read());
                   } 
             Serial.println(POST_line);
+            server.process_POST(POST_line, &WS);
             
             client.println("HTTP/1.1 200 OK");
             client.println("Content-type:text/html");
@@ -222,7 +223,7 @@ void webserver() {
             client.println();
 
             // Proceess the header to 
-            server.process_header(header, &WS);
+            server.process_GET(header, &WS);
 
 
             if (header.indexOf("GET /mail") >= 0) {
@@ -272,6 +273,14 @@ void webserver() {
               client.print("<p><div  class='division'>"); // Div with button
               client.print("<p>Pump ");
               client.print(pump);
+              client.print(": ");
+              client.print("<form method = \"POST\"><input type=\"text\" name=\"P");
+              client.print(pump);
+              client.print("lab\" value=\"");
+              client.print(WS.pump[pump].label);
+              client.print("\" ></form>");
+
+              client.print("; ");
               client.print(" - Auto ");
               (WS.pump[pump].automatic_timer_mode ) ? client.print("ON") : client.print("OFF");
               client.println("</p>");

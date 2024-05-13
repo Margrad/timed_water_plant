@@ -11,15 +11,15 @@ struct _sensor {
   int16_t Value;
 };
 
-struct _pump_sensor_config{
+/*struct _pump_sensor_config{
   bool sensores[SENSORS_NUM];
   bool is_watering; 
-  bool is_waiting; 
+  bool is_waiting;
   u_int min_val[SENSORS_NUM]; 
   u_int max_val[SENSORS_NUM];
   int next_seconds_check;
   };
-
+*/
 
 struct _pump {
   // TODO finish automatation
@@ -28,9 +28,10 @@ struct _pump {
   int s_hour,s_min,s_sec; // s for start
   int e_hour,e_min,e_sec; //
   
-  struct _pump_sensor_config sensor_config;
+//  struct _pump_sensor_config sensor_config;
   bool automatic_timer_mode;
   bool automatic_sensor_mode;
+  char label[16]; 
 };
 
 class WateringSystem {

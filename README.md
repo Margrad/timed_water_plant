@@ -11,8 +11,9 @@ This server can do the following:
 	 - Set the pumps to automatically water the plants at a specified time
 	 - Set all pumps ON/OFF, or Auto/Manual mode in one go
 	 - Send an email with the current values in the Log
+         - Label the pumps (so I can more easily remember which pump goes where)
 	 - TODO: sets which sensors to display in the graph
-	 - TODO: label the pumps and sensores (so I can more easily remember which pump/sensor goes where)
+	 - TODO: Label the sensores (so I can more easily remember which sensor goes where)
     - This page also allows to see:
 	 - The graphic with the sensors data in the Log
 	 - The current value for each sensor

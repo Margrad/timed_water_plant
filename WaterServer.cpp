@@ -2,7 +2,7 @@
 
 
 
-void WaterServer::process_header(String header, WateringSystem *WS) {
+void WaterServer::process_GET(String header, WateringSystem *WS) {
   /*
     This function processes the header and updates the Watering system accordingly
     - Get timers for watering updated per pump
@@ -157,4 +157,31 @@ void WaterServer::process_header(String header, WateringSystem *WS) {
       WS->water_plant(pump_index);
     }
   }
+}
+
+void WaterServer::process_POST(String Post, WateringSystem *WS){
+int index;
+int pump_index;  
+index = Post.indexOf("P");
+  if ( index >= 0 && index < 25)
+  {
+    pump_index = (int)Post[index + 1] - '0';
+    if (pump_index < 0 || pump_index >= PUMPS_NUM){
+      Serial.print("Issue with Pump number: ");
+      Serial.print(pump_index);
+      Serial.println(" is outside the expected number of pumps");
+      return;} // checks for correct pump number
+    
+    if (Post[index + 2] == 'l' && Post[index + 3] == 'a' && Post[index + 4] == 'b')
+    {
+      for (int i=0;i<16;i++){
+        if (Post[index + 6 + i] == '\n' || Post[index + 6 + i] == '\0'){
+          WS->pump[pump_index].label[i]='\0'; 
+          break;
+          }
+        WS->pump[pump_index].label[i]=Post[index + 6 + i];
+        }
+      }
+      return;
+  }  
 }

@@ -20,6 +20,8 @@ void WateringSystem::init_watering() {
     pump[i].e_min = 50;
     pump[i].e_sec = 3;
     pump[i].automatic_timer_mode = true;
+    pump[i].label[0]='P';
+    pump[i].label[1]='0'+i;
   }
 
 }

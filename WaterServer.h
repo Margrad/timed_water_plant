@@ -12,8 +12,8 @@ class WaterServer: public WiFiServer {
    public:
       WaterServer(int x) : WiFiServer(x){
         }
-      
-      void process_header(String header, WateringSystem *WS);
+      void process_POST(String Post, WateringSystem *WS); 
+      void process_GET(String header, WateringSystem *WS);
 };
 
 
