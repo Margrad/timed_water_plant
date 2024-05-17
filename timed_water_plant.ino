@@ -32,7 +32,6 @@ void displaytime(WiFiClient *client, int time);
 */
 // Set web server port number to 7531 (easier to use a different port from 80 for port forwarding)
 WaterServer server(PORT_NUMBER);
-String header;           // Variable to store the HTTP request
 unsigned long currentTime = millis();
 unsigned long previousTime = 0;
 const long timeoutTime = 2000; // 2s
@@ -48,9 +47,6 @@ MyLog Logger;
 // Time variables
 struct tm timeinfo;
 bool Flag_log = true;
-
-// time when the Logger will be called to log sensors data
-int log_hour, log_min;
 
 char date_buffer[30];
 char up_time[30];
@@ -93,18 +89,13 @@ void setup() {
   Serial.println(date_buffer);
   WS.update_sensores();
 
-  // Log starting data
-  Logger.save_to_log(timeinfo, WS.sensor);
 
   // Set the next time to log the sensors data
-  log_hour = timeinfo.tm_hour;
-  log_min = timeinfo.tm_min + LOG_INTERVAL_MINS;
-  if (log_min >= 60 ) {
-    log_min -= 60;
-    log_hour++;
-  }
-  if (log_hour > 23 ) log_hour = 0;
-  
+  Logger.init_log_time(&timeinfo);
+  // Log starting data
+  Logger.save_to_log(timeinfo, WS.sensor);
+  Logger.set_next_log_time(LOG_INTERVAL_MINS);
+
   WS.update_sensores();
 #ifdef __DEBUG__
 #ifdef __DEBUG__PLOT__
@@ -129,38 +120,26 @@ void loop() {
 
   webserver();
   getLocalTime(&timeinfo);
-
   WS.TimeChecker(&timeinfo);
 
+
   // Log stuff
-  if (timeinfo.tm_min == log_min && timeinfo.tm_hour == log_hour)
+  if (timeinfo.tm_min == Logger.get_log_min() && timeinfo.tm_hour == Logger.get_log_hour())
   {
-    strftime(date_buffer, sizeof(date_buffer), "%Y%m%d%H%M%S", &timeinfo);
-    Serial.println(date_buffer);
+    // strftime(date_buffer, sizeof(date_buffer), "%Y%m%d%H%M%S", &timeinfo);
+    // Serial.println(date_buffer);
     /// Update next time to log
     WS.update_sensores();
-    log_hour = timeinfo.tm_hour;
-    log_min = timeinfo.tm_min + LOG_INTERVAL_MINS;
-    if (log_min >= 60 ) {
-      log_min -= 60;
-      log_hour++;
-    }
-    if (log_hour >= 23 ) log_hour = 0;
-    //
     Logger.save_to_log(timeinfo, WS.sensor);
-    log_hour = timeinfo.tm_hour;
-    log_min = timeinfo.tm_min + LOG_INTERVAL_MINS;
-    if (log_min >= 60 ) {
-      log_min -= 60;
-      log_hour++;
-    }
-    if (log_hour > 23 ) log_hour = 0;
+    Logger.set_next_log_time(LOG_INTERVAL_MINS);
   }
 }
 
 
 
 void webserver() {
+  
+  String header;           // Variable to store the HTTP request
   WiFiClient client = server.available();   // Listen for incoming clients
 
   if (client) {                             // If a new client connects,
@@ -249,18 +228,6 @@ void webserver() {
             client.println("<body><h1>Watering the plants</h1>");
 
 
-/*
- * Create POST test
- */
-#ifdef __DEBUG__
-            client.println("<form method=\"post\">");
-            client.println("<label for=\"option1\">Option 1:</label>");
-            client.println("<input type=\"text\" id=\"fname\" name=\"fname\"><br><br>");
-            client.println("<label for=\"option2\">Option 2:</label>");
-            client.println("<input type=\"text\" id=\"lname\" name=\"lname\"><br><br>");
-            client.println("<input type=\"submit\" value=\"Submit\">");
-            client.println("</form>");
-#endif  //__DEBUG__
             /*
                Print Pump config
             // Display current Pump state, and ON/OFF buttons
@@ -270,7 +237,7 @@ void webserver() {
             {
 
               // Creates buttons to turns the auto watering on or off
-              client.print("<p><div  class='division'>"); // Div with button
+              client.print("<p><div  class='division'>"); // Div with button, pump name and label
               client.print("<p>Pump ");
               client.print(pump);
               client.print(": ");
@@ -278,9 +245,8 @@ void webserver() {
               client.print(pump);
               client.print("lab\" value=\"");
               client.print(WS.pump[pump].label);
-              client.print("\" ></form>");
+              client.print("\" size=\"10\" ></form>");
 
-              client.print("; ");
               client.print(" - Auto ");
               (WS.pump[pump].automatic_timer_mode ) ? client.print("ON") : client.print("OFF");
               client.println("</p>");

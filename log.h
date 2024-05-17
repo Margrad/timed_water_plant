@@ -12,6 +12,8 @@
 class MyLog {
   private:
     SMTPSession smtp;
+    // time when the Logger will be called to log sensors data
+    int log_hour, log_min;
   public:
     int i = 0;
     bool rotated = false;
@@ -25,7 +27,13 @@ class MyLog {
         for (int j = 0; j < SENSORS_NUM; j++)
           sensorLog[i][j] = 0;
       }
+      
     }
+    
+    int get_log_hour(){return log_hour;};
+    int get_log_min(){return log_min;};
+    void set_next_log_time(int interval_in_minutes);
+    void init_log_time(struct tm *timeinfo);
 
     String prepare_log_to_email();
     void save_to_log(struct tm, struct _sensor*);

@@ -132,9 +132,9 @@ void MyLog::save_to_log(struct tm tempo, struct _sensor *sensores) {
 
 
 String MyLog::prepare_log_to_email() {
-/*
- Function to turn the information on the logger into a String that can be emailed.
-*/ 
+  /*
+    Function to turn the information on the logger into a String that can be emailed.
+  */
   char date_buffer[10];
   String LOG = "[";
   LOG += "['tempo',";
@@ -171,4 +171,20 @@ String MyLog::prepare_log_to_email() {
 
   return LOG;
 
+}
+
+void MyLog::set_next_log_time(int interval_in_minutes) {
+  log_hour = log_hour;
+  log_min = log_min + interval_in_minutes;
+  if (log_min >= 60 ) {
+    log_min -= 60;
+    log_hour++;
+  }
+  if (log_hour > 23 ) log_hour = 0;
+
+}
+
+void MyLog::init_log_time(struct tm *timeinfo) {
+  log_hour = timeinfo->tm_hour;
+  log_min = timeinfo->tm_min;
 }
