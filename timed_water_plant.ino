@@ -100,14 +100,17 @@ void setup() {
 #ifdef __DEBUG__
 #ifdef __DEBUG__PLOT__
   struct _sensor debug_sensor[SENSORS_NUM];
-  struct tm debug_time;
+//  struct tm debug_time;
+//  debug_time.tm_year = 2024-1900;
+//  debug_time.tm_mon = 01;
+ // debug_time.tm_mday = 02;
   for (int i=0;i<SENSORS_NUM;i++)
     debug_sensor[i].Value=i;
     
   for(int j=0;j<37;j++)
     {
-      debug_time.tm_hour=j;
-      Logger.save_to_log(debug_time, debug_sensor);
+      timeinfo.tm_hour=timeinfo.tm_hour+j;
+      Logger.save_to_log(timeinfo, debug_sensor);
     }
 #endif //__DEBUG__PLOT_
 #endif // __DEBUG__  
@@ -369,7 +372,7 @@ void google_graph(WiFiClient *client) {
   if (Logger.rotated) {
     for (t = Logger.i; t < LOG_SIZE; t++) {
       client->print("[");
-      strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &Logger.timeLog[t]);
+      strftime(date_buffer, sizeof(date_buffer), "new Date(%Y,%m,%d,%OH,%OM,OS)", &Logger.timeLog[t]);
       client->print(date_buffer);
       client->print(",");
       for (s = 0; s < SENSORS_NUM ; s++) {
@@ -382,7 +385,7 @@ void google_graph(WiFiClient *client) {
     }
     for (t = 0 ; t < Logger.i; t++) {
       client->print("[");
-      strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &Logger.timeLog[t]);
+      strftime(date_buffer, sizeof(date_buffer), "new Date(%Y,%m,%d,%H,%M)", &Logger.timeLog[t]);
       client->print(date_buffer);
       client->print(",");
       for (s = 0; s < SENSORS_NUM ; s++) {
@@ -400,7 +403,7 @@ void google_graph(WiFiClient *client) {
   } else {
     for (t = 0 ; t < Logger.i; t++) {
       client->print("[");
-      strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &Logger.timeLog[t]);
+      strftime(date_buffer, sizeof(date_buffer), "new Date(%Y,%m,%d,%H,%M)", &Logger.timeLog[t]);
       client->print(date_buffer);
       //client.print(t);
       client->print(",");
