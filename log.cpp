@@ -150,7 +150,7 @@ String MyLog::prepare_log_to_email() {
   LOG += "],\n";
   for (int t = 0 ; t < LOG_SIZE; t++) {
     LOG += "[";
-    strftime(date_buffer, sizeof(date_buffer), "%d%H%M", &timeLog[t]);
+    strftime(date_buffer, sizeof(date_buffer), "%y%m%d%H%M", &timeLog[t]);
     LOG += '\"';
     LOG += date_buffer;
     LOG += '\"';
