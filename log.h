@@ -2,11 +2,15 @@
 #define LOG_H
 
 #include <ESP_Mail_Client.h>
+#include <WiFi.h>
 #include "watering.h"
 #include "pass.h"
 
 #define SMTP_PORT 465
 #define SMTP_HOST  "smtp.gmail.com"
+// For when I add a possibility to receive instructions by email
+// #define IMAP_PORT 993          
+// #define IMAP_HOST  "imap.gmail.com"
 #define LOG_SIZE 128
 
 class MyLog {
@@ -38,7 +42,9 @@ class MyLog {
     String prepare_log_to_email();
     void save_to_log(struct tm, struct _sensor*);
     void send_email(String);
+    void read_email();
     void print_from_log();
+    void reset_log();
 
 };
 

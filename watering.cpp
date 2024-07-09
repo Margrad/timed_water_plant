@@ -14,10 +14,10 @@ void WateringSystem::init_watering() {
     pinMode(pump[i].Pin, OUTPUT);
     digitalWrite(pump[i].Pin, HIGH);
     pump[i].s_hour = 9;
-    pump[i].s_min = 50;
+    pump[i].s_min = 50+i;
     pump[i].s_sec = 0;
     pump[i].e_hour = 9;
-    pump[i].e_min = 50;
+    pump[i].e_min = 50+i;
     pump[i].e_sec = 3;
     pump[i].automatic_timer_mode = true;
     pump[i].label[0]='P';

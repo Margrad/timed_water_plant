@@ -1,6 +1,6 @@
 #ifndef WATERING_H
 #define WATERING_H
-#include "arduino.h"
+#include "Arduino.h"
 
 #define SENSORS_NUM 4
 #define PUMPS_NUM 5

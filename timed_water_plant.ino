@@ -10,6 +10,7 @@
 #include "watering.h" // set sensores and pumps
 #include "pass.h"     // where the passwords are you will need to create this file yourselfe
 #include "log.h"      // sets the logging files, needs to be set after the waterings, as it uses some of the watering data
+#include <sys/time.h>
 
 /* The sign in credentials present in pass.h
   #define AUTHOR_EMAIL "email_esp_uses@to_send.emails"
@@ -43,9 +44,11 @@ WateringSystem WS;
 MyLog Logger;
 
 
-
 // Time variables
 struct tm timeinfo;
+struct timeval tv;
+
+
 bool Flag_log = true;
 
 char date_buffer[30];
@@ -78,10 +81,44 @@ void setup() {
   configTime(0, 3600, "time.google.com");
 
   //char strftime_buf[20];
-  while (!getLocalTime(&timeinfo)) {
-    Serial.println("Could not obtain time info");
-    configTime(0, 3600, "time.google.com");
+  for(int count = 0; count <5 ; count ++){
+    if(getLocalTime(&timeinfo)) break; // check if the time was set and breaks, else, tries to get it again
+  
+    Serial.print("Could not obtain time info: checking google, WiFi strength: ");
+    Serial.println(WiFi.RSSI());
+    configTime(0, 3600, "time.google.com");   // If Tries google server, if it fails, it tries the ntp server
+    if (!getLocalTime(&timeinfo)){ 
+    Serial.print("Could not obtain time info: checking nist, WiFi strength: ");
+    Serial.println(WiFi.RSSI());
+      configTime(0, 3600, "time.nist.gov");
+      }
+      delay(1000);
   }
+  
+  if (!getLocalTime(&timeinfo)){
+    Serial.println("Could not get the online time, please set it manually by entering the current UNIX TIME STAMP\n - https://www.unixtimestamp.com/");
+    while (!getLocalTime(&timeinfo)){  // https://www.unixtimestamp.com/ 1718921060
+      char endMarker = '\n';
+      char rc;
+      long total = 0;
+      while (Serial.available() > 0) {
+          rc = Serial.read();
+  
+          if (rc != endMarker) {
+            if (rc >= '0' &&  rc <= '9'){
+              total *= 10;
+              total += rc-'0';
+            }
+          }
+          else {
+            tv.tv_sec =   total;  
+            settimeofday(&tv, NULL);
+            break;
+          }
+      }
+    }
+  }
+  
 
   // Display current time
   strftime(date_buffer, sizeof(date_buffer), "%Y/%m/%d %H:%M:%S", &timeinfo);
@@ -168,13 +205,19 @@ void webserver() {
             if (header.indexOf("POST") == 0){
                 int index = header.indexOf("Content-Length:")+16;
                 char temp = header[index];
-                String number = "";
+                // Edit to convert more directly to number
+                int Content_Length = 0;
                 while (temp != '\n'){
-                  number += temp;
+                  if (temp < '0' || temp > '9')
+                    {
+                      Serial.write("Error with POST length, character is not a number!\nReturning from webserver()!");
+                      return;
+                    }
+                  Content_Length *=10;
+                  Content_Length += temp-'0';
                   index++;
                   temp = header[index];
                   }
-                int Content_Length = number.toInt();
             Serial.println(Content_Length);
                 POST_line = "";
                 for(int i = 0; i< Content_Length ; i++){
@@ -188,11 +231,11 @@ void webserver() {
             client.println("Connection: close");
             client.println();
                         
-            client.println("<!DOCTYPE html><html><head><meta http-equiv=\"refresh\" content=\"1\"></head></html>");
-            client.println();
+            //client.println("<!DOCTYPE html><html><head><meta http-equiv=\"refresh\" content=\"1\"></head></html>");
+            //client.println();
             header = "";
-            client.stop();  
-            return;     
+            //client.stop();  
+            //return;     
             }
 
 
@@ -303,6 +346,7 @@ void webserver() {
             client.println("<p><a href=\"/AutoA/off\"><button class=\"button button2\">Turn OFF ALL Auto watering</button></a></p>");
             client.println("<p><a href=\"/AutoA/on\"><button class=\"button button2\">Turn ON ALL Auto watering</button></a></p>");
             client.println("<p><a href=\"/mail\"><button class=\"button button2\"> Send email</button></a></p>");
+            client.println("<form action=\"\" method=\"POST\"><button name=\"Reset_LOG\" value=\"reset\">Reset</button></form>");
 
             client.println("<h1>Sensors:</h1>");
             for (int i = 0 ; i < SENSORS_NUM; i++) {
@@ -372,7 +416,7 @@ void google_graph(WiFiClient *client) {
   if (Logger.rotated) {
     for (t = Logger.i; t < LOG_SIZE; t++) {
       client->print("[");
-      strftime(date_buffer, sizeof(date_buffer), "new Date(%Y,%m,%d,%OH,%OM,OS)", &Logger.timeLog[t]);
+      strftime(date_buffer, sizeof(date_buffer), "new Date(%Y,%m,%d,%H,%M)", &Logger.timeLog[t]);
       client->print(date_buffer);
       client->print(",");
       for (s = 0; s < SENSORS_NUM ; s++) {
@@ -423,7 +467,7 @@ void google_graph(WiFiClient *client) {
   client->println("]);");
   client->println("var options = {");
   client->println("title: 'Soil Humidy Sensors',");
-  client->println("hAxis: {title: 'Time'},");
+  client->println("hAxis: {title: 'Time',format: 'dd/MM/yyyy HH:mm'},");
   client->println("vAxis: {title: 'Humidity'},");
   client->println("legend: 'none'};");
   client->println("var chart = new google.visualization.LineChart(document.getElementById('myChart'));");

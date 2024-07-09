@@ -14,6 +14,7 @@ class WaterServer: public WiFiServer {
         }
       void process_POST(String Post, WateringSystem *WS); 
       void process_GET(String header, WateringSystem *WS);
+      void process_METHODE(String header, WateringSystem *WS);
 };
 
 

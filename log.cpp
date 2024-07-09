@@ -24,7 +24,6 @@ void MyLog::send_email(String textMsg) {
   message.subject = "Water System Report";
   message.addRecipient("Marco", RECIPIENT_EMAIL); // This will be used with RCPT TO command and 'To' header field.
 
-  //String textMsg = "This is simple plain text message";
   message.text.content = textMsg;
 
   /** If the message to send is a large string, to reduce the memory used from internal copying  while sending,
@@ -106,6 +105,8 @@ void MyLog::send_email(String textMsg) {
   /* Connect to the server */
   if (!smtp.connect(&session /* session credentials */))
     return;
+  else
+    Serial.println("Error sending the email");
 
   /* Start sending Email and close the session */
   if (!MailClient.sendMail(&smtp, &message))
@@ -188,3 +189,13 @@ void MyLog::init_log_time(struct tm *timeinfo) {
   log_hour = timeinfo->tm_hour;
   log_min = timeinfo->tm_min;
 }
+
+
+void MyLog::reset_log(){
+  rotated = false;
+  for (int i = 0; i < LOG_SIZE; i++ )
+    {
+      for (int j = 0; j < SENSORS_NUM; j++)
+        sensorLog[i][j] = 0;
+    }  
+  }
