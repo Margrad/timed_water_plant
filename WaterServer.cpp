@@ -2,7 +2,7 @@
 
 
 
-void WaterServer::process_GET(String header, WateringSystem *WS) {
+void WaterServer::process_GET(String header, WateringSystem *WS, MyLog *Logger) {
   /*
     This function processes the header and updates the Watering system accordingly
     - Get timers for watering updated per pump
@@ -156,6 +156,10 @@ void WaterServer::process_GET(String header, WateringSystem *WS) {
       WS->pump[pump_index].State = 0;
       WS->water_plant(pump_index);
     }
+  }
+  if (header.indexOf("GET /mail") >= 0) {
+    Serial.println("sending mail...");
+    Logger->send_email(Logger->prepare_log_to_email());
   }
 }
 

@@ -31,7 +31,6 @@ class MyLog {
         for (int j = 0; j < SENSORS_NUM; j++)
           sensorLog[i][j] = 0;
       }
-      
     }
     
     int get_log_hour(){return log_hour;};

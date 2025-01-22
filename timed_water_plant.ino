@@ -26,8 +26,11 @@
 
 
 void webserver();
+
+// Declare suporting functions for the website
 void google_graph(WiFiClient *client);
 void displaytime(WiFiClient *client, int time);
+
 /* ***********************************************
  * * WIFI server Set up
 */
@@ -55,7 +58,10 @@ char date_buffer[30];
 char up_time[30];
 
 
-// the setup function runs once when you press reset or power the board
+// The setup function runs once when you press reset or power the board
+// This function will connect to WiFi, get the current time UTC and allows to enter time manually
+// If it fails it allows to enter time manually. It will then enter the first sensores values into the log.
+
 void setup() {
   Serial.begin(115200);
   analogReadResolution(12);
@@ -81,7 +87,7 @@ void setup() {
   configTime(0, 3600, "time.google.com");
 
   //char strftime_buf[20];
-  for(int count = 0; count <5 ; count ++){
+  for(int count = 0; count <3 ; count ++){
     if(getLocalTime(&timeinfo)) break; // check if the time was set and breaks, else, tries to get it again
   
     Serial.print("Could not obtain time info: checking google, WiFi strength: ");
@@ -92,19 +98,20 @@ void setup() {
     Serial.println(WiFi.RSSI());
       configTime(0, 3600, "time.nist.gov");
       }
-      delay(1000);
+      delay(500);
   }
-  
+
+
+  // If it fails to set time online, you can set the time by entering the UNIX TIME STAMP
   if (!getLocalTime(&timeinfo)){
     Serial.println("Could not get the online time, please set it manually by entering the current UNIX TIME STAMP\n - https://www.unixtimestamp.com/");
-    while (!getLocalTime(&timeinfo)){  // https://www.unixtimestamp.com/ 1718921060
-      char endMarker = '\n';
+    while (!getLocalTime(&timeinfo)){  // https://www.unixtimestamp.com/ 
       char rc;
       long total = 0;
       while (Serial.available() > 0) {
           rc = Serial.read();
   
-          if (rc != endMarker) {
+          if (rc != '\n') {
             if (rc >= '0' &&  rc <= '9'){
               total *= 10;
               total += rc-'0';
@@ -163,7 +170,7 @@ void loop() {
   WS.TimeChecker(&timeinfo);
 
 
-  // Log stuff
+  // Check the time and Log the information
   if (timeinfo.tm_min == Logger.get_log_min() && timeinfo.tm_hour == Logger.get_log_hour())
   {
     // strftime(date_buffer, sizeof(date_buffer), "%Y%m%d%H%M%S", &timeinfo);
@@ -207,9 +214,12 @@ void webserver() {
                 char temp = header[index];
                 // Edit to convert more directly to number
                 int Content_Length = 0;
-                while (temp != '\n'){
+                while (temp != '\n' && temp != 13){
                   if (temp < '0' || temp > '9')
                     {
+                      char s [80];
+                      sprintf (s, "%d: %c: index: %d",temp,temp,index);
+                      Serial.println(s);
                       Serial.write("Error with POST length, character is not a number!\nReturning from webserver()!");
                       return;
                     }
@@ -225,19 +235,9 @@ void webserver() {
                   } 
             Serial.println(POST_line);
             server.process_POST(POST_line, &WS);
-            
-            client.println("HTTP/1.1 200 OK");
-            client.println("Content-type:text/html");
-            client.println("Connection: close");
-            client.println();
-                        
-            //client.println("<!DOCTYPE html><html><head><meta http-equiv=\"refresh\" content=\"1\"></head></html>");
-            //client.println();
-            header = "";
-            //client.stop();  
-            //return;     
-            }
 
+            header = "";
+            }
 
             
             // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
@@ -248,13 +248,10 @@ void webserver() {
             client.println();
 
             // Proceess the header to 
-            server.process_GET(header, &WS);
+            server.process_GET(header, &WS, &Logger);
 
 
-            if (header.indexOf("GET /mail") >= 0) {
-              Serial.println("sending mail...");
-              Logger.send_email(Logger.prepare_log_to_email());
-            }
+
             // Display the HTML web page
             client.println("<!DOCTYPE html><html>");
             client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
@@ -275,9 +272,9 @@ void webserver() {
 
 
             /*
-               Print Pump config
-            // Display current Pump state, and ON/OFF buttons
-            // If the Pump is off, it displays the ON button
+              Print Pump config
+              Display current Pump state, and ON/OFF buttons
+              If the Pump is off, it displays the ON button
             */
             for (int pump = 0; pump < PUMPS_NUM; pump++)
             {
@@ -395,7 +392,8 @@ void webserver() {
 
 
 void google_graph(WiFiClient *client) {
-  //char date_buffer[16];
+  // This function uses google charts to create a plot on the web page with the 
+  // Data on the Log.
   int t;
   int s;
   client->println("<script>");

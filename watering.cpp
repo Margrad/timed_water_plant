@@ -109,7 +109,6 @@ void WateringSystem::watering_sensores_tick(struct tm *timeinfo){
       // is_waterin = true
       // turn on pump
       // set timer for 3 seconds
-    
     }
   }
 

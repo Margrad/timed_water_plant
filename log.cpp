@@ -103,10 +103,11 @@ void MyLog::send_email(String textMsg) {
   // Time can be set manually with provided timestamp to function smtp.setSystemTime.
 
   /* Connect to the server */
-  if (!smtp.connect(&session /* session credentials */))
+  if (!smtp.connect(&session /* session credentials */)){
+    
+    Serial.println("Email sent");
     return;
-  else
-    Serial.println("Error sending the email");
+  }
 
   /* Start sending Email and close the session */
   if (!MailClient.sendMail(&smtp, &message))

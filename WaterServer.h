@@ -2,7 +2,7 @@
 
 #include <WiFi.h>
 #include "watering.h"
-
+#include "log.h"
 
 #define PORT_NUMBER 7531
 
@@ -13,7 +13,7 @@ class WaterServer: public WiFiServer {
       WaterServer(int x) : WiFiServer(x){
         }
       void process_POST(String Post, WateringSystem *WS); 
-      void process_GET(String header, WateringSystem *WS);
+      void process_GET(String header, WateringSystem *WS,MyLog *Logger);
       void process_METHODE(String header, WateringSystem *WS);
 };
 
